@@ -5,7 +5,7 @@ import useAppContext from "../../contexts/AppContext.jsx";
 
 import PeopleDetails from "./components/PeopleDetails.jsx";
 import PlanetsDetails from "./components/PlanetsDetails.jsx";
-import StarshipsDetails from "./components/StarshipsDetails.jsx";
+import StarshipsDetails from "./components/PeopleDetails.jsx";
 
 const Card = ({
   uid,

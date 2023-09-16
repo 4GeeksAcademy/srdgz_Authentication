@@ -5,7 +5,7 @@ import HomePage from "../views/HomePage.jsx";
 import DetailPage from "../views/DetailPage.jsx";
 import ErrorPage from "../views/ErrorPage.jsx";
 import LoginPage from "../views/LoginPage.jsx";
-import SingupPage from "../views/SingupPage.jsx";
+import SingupPage from "../views/SignupPage.jsx";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
