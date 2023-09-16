@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const SingupPage = () => {
+import { createUser } from "../services/createUser";
+
+const SignupPage = () => {
   const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
   const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -21,7 +24,7 @@ const SingupPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const { username, email, password } = formData;
 
@@ -37,9 +40,42 @@ const SingupPage = () => {
       return;
     }
 
-    // Aquí va la lógica de registro de nuevo usuario.
-    // Hay que tener en cuenta que el usuario debe ser único, por lo que hay que comprobar que no exista en la base de datos.
+    // Aquí verificamos si el nombre de usuario ya existe en la base de datos.
+    //const isUsernameAvailable = await checkUsernameAvailability(username);
+
+    //if (!isUsernameAvailable) {
+      //alert("Username is not available. Please choose a different one.");
+      //return;
+   // }
+
+    const user = {
+      username,
+      email,
+      password,
+    };
+
+    try {
+      const response = await createUser(user);
+      if (response.status === 201) {
+        alert("User created successfully");
+        navigate("/");
+      } else {
+        alert("Error registering user");
+      }
+    } catch (error) {
+      console.error("Error registering user:", error);
+      alert("Error registering user");
+    }
   };
+
+  // Función para verificar la disponibilidad del nombre de usuario.
+  //const checkUsernameAvailability = async (username) => {
+    // Realiza una solicitud a tu API o servidor para verificar la disponibilidad del nombre de usuario.
+    // Debe devolver true si está disponible y false si no lo está.
+    // Implementa esta función según tu infraestructura de backend.
+    // Por ahora, puedes devolver true para fines de prueba.
+    //return true;
+ // };
 
   return (
     <div className="container vh-100 mt-5">
@@ -47,7 +83,7 @@ const SingupPage = () => {
         <div className="col-md-6">
           <div className="card">
             <div className="card-body">
-              <h2 className="card-title text-center my-5">Sing Up</h2>
+              <h2 className="card-title text-center my-5">Sign Up</h2>
               <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                   <input
@@ -110,7 +146,7 @@ const SingupPage = () => {
                     type="submit"
                     className="btn btn-warning w-60 fw-bold px-5 py-2"
                   >
-                    SING UP
+                    SIGN UP
                   </button>
                 </div>
               </form>
@@ -134,4 +170,4 @@ const SingupPage = () => {
   );
 };
 
-export default SingupPage;
+export default SignupPage;

@@ -5,10 +5,10 @@ import HomePage from "../views/HomePage.jsx";
 import DetailPage from "../views/DetailPage.jsx";
 import ErrorPage from "../views/ErrorPage.jsx";
 import LoginPage from "../views/LoginPage.jsx";
-import SingupPage from "../views/SignupPage.jsx";
+import SignupPage from "../views/SignupPage.jsx";
 
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Navbar from "../components/Navbar/Navbar.jsx";
+import Footer from "../components/Footer/Footer.jsx";
 
 const Router = () => {
   return (
@@ -17,7 +17,7 @@ const Router = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/Login" element={<LoginPage />} />
-        <Route path="/Singup" element={<SingupPage />} />
+        <Route path="/Signup" element={<SignupPage />} />
         <Route path="/:uid" element={<DetailPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>

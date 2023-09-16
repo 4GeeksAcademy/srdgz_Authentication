@@ -100,7 +100,7 @@ const LoginPage = () => {
                 <div>
                   <span>Don't have an account? </span>
                   <Link
-                    to="/Singup"
+                    to="/Signup"
                     className="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fw-bold"
                   >
                     Sign up
