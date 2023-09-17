@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const LoginPage = () => {
-  const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-  const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+  const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+  const passwordPattern = /^.{4,}$/;
 
   const [showPassword, setShowPassword] = useState(false);
   const [rememberUser, setRememberUser] = useState(false);
@@ -20,7 +20,7 @@ const LoginPage = () => {
 
     if (!passwordPattern.test(password)) {
       alert(
-        "The password must contain at least one uppercase letter, one lowercase letter, one number and be at least 8 characters"
+        "The password must contain at least 4 characters"
       );
       return;
     }
@@ -62,11 +62,11 @@ const LoginPage = () => {
                     />
                   </div>
                 </div>
-                <div class="form-check mb-5">
+                <div className="form-check mb-5">
                   <div>
-                    <label class="form-check-label" for="flexCheckDefault">
+                    <label className="form-check-label" htmlFor="flexCheckDefault">
                       <input
-                        class="form-check-input"
+                        className="form-check-input"
                         type="checkbox"
                         value="check-password"
                         id="flexCheckDefault"
@@ -76,9 +76,9 @@ const LoginPage = () => {
                     </label>
                   </div>
                   <div>
-                    <label class="form-check-label" for="flexCheckDefault">
+                    <label className="form-check-label" htmlFor="flexCheckDefault">
                       <input
-                        class="form-check-input"
+                        className="form-check-input"
                         type="checkbox"
                         onChange={() => setRememberUser(!rememberUser)}
                       />

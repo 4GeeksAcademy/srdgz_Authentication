@@ -84,7 +84,7 @@ def get_one_user(user_id):
 @app.route('/user', methods=['POST'])
 def create_user():
     request_body_user = request.get_json()
-    new_user = User(username=request_body_user["username"], email=request_body_user["email"], password=request_body_user["password"])
+    new_user = User(email=request_body_user["email"], password=request_body_user["password"])
     db.session.add(new_user)
     db.session.commit()
     return jsonify(request_body_user), 200
@@ -95,8 +95,6 @@ def update_user(user_id):
     chosen_user = User.query.get(user_id)
     if chosen_user is None:
         raise APIException('User not found', status_code=404)
-    if "username" in request_body_user:
-        chosen_user.username = request_body_user["username"]
     if "password" in request_body_user:
         chosen_user.password = request_body_user["password"]
     if "email" in request_body_user:

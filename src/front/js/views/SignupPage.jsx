@@ -4,59 +4,43 @@ import { Link, useNavigate } from "react-router-dom";
 import { createUser } from "../services/createUser";
 
 const SignupPage = () => {
-  const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-  const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
     password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChangeEmail = (e) => {
+    const email = e.target.value;
     setFormData({
       ...formData,
-      [name]: value,
+      email: email,
+    });
+  };
+
+  const handleChangePassword = (e) => {
+    const password = e.target.value;
+    setFormData({
+      ...formData,
+      password: password,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { username, email, password } = formData;
-
-    if (!emailPattern.test(email)) {
-      alert("Please enter a valid email");
+    const { email, password } = formData;
+    if (!email || !password) {
+      alert("Please enter both email and password");
       return;
     }
-
-    if (!passwordPattern.test(password)) {
-      alert(
-        "The password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters"
-      );
-      return;
-    }
-
-    // Aquí verificamos si el nombre de usuario ya existe en la base de datos.
-    //const isUsernameAvailable = await checkUsernameAvailability(username);
-
-    //if (!isUsernameAvailable) {
-      //alert("Username is not available. Please choose a different one.");
-      //return;
-   // }
-
-    const user = {
-      username,
-      email,
-      password,
-    };
 
     try {
-      const response = await createUser(user);
-      if (response.status === 201) {
+      const response = await createUser(formData);
+
+      if (response.status === 200) {
         alert("User created successfully");
         navigate("/");
       } else {
@@ -68,15 +52,6 @@ const SignupPage = () => {
     }
   };
 
-  // Función para verificar la disponibilidad del nombre de usuario.
-  //const checkUsernameAvailability = async (username) => {
-    // Realiza una solicitud a tu API o servidor para verificar la disponibilidad del nombre de usuario.
-    // Debe devolver true si está disponible y false si no lo está.
-    // Implementa esta función según tu infraestructura de backend.
-    // Por ahora, puedes devolver true para fines de prueba.
-    //return true;
- // };
-
   return (
     <div className="container vh-100 mt-5">
       <div className="row justify-content-center">
@@ -87,28 +62,15 @@ const SignupPage = () => {
               <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                   <input
-                    type="text"
-                    className="form-control py-3"
-                    id="username"
-                    name="username"
-                    placeholder="Username"
-                    required
-                    value={formData.username}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="mb-5">
-                  <input
                     type="email"
                     className="form-control py-3"
                     id="email"
                     name="email"
                     placeholder="Email"
                     required
-                    pattern={emailPattern.source}
                     title="Please enter a valid email"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={handleChangeEmail}
                   />
                 </div>
                 <div className="mb-3">
@@ -120,18 +82,17 @@ const SignupPage = () => {
                       name="password"
                       placeholder="Password"
                       required
-                      pattern={passwordPattern.source}
                       title="The password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters"
                       value={formData.password}
-                      onChange={handleChange}
+                      onChange={handleChangePassword}
                     />
                   </div>
                 </div>
-                <div class="form-check mb-5">
+                <div className="form-check mb-5">
                   <div>
-                    <label class="form-check-label" for="flexCheckDefault">
+                    <label className="form-check-label" htmlFor="flexCheckDefault">
                       <input
-                        class="form-check-input"
+                        className="form-check-input"
                         type="checkbox"
                         value="check-password"
                         id="flexCheckDefault"
