@@ -5,12 +5,10 @@ import authService from "../services/authService";
 
 const SignupPage = () => {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChangeEmail = (e) => {
@@ -40,8 +38,8 @@ const SignupPage = () => {
     try {
       const response = await authService.signup(email, password);
 
-      if (response && response.access_token) {
-        localStorage.setItem("token", response.access_token);
+      if (response && response.token) {
+        localStorage.setItem("token", response.token);
         alert("User created successfully");
         navigate("/");
       } else {

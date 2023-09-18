@@ -1,14 +1,14 @@
 const URL = "https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev";
 
 const signup = (email, password) => {
-    return fetch(URL + "/signup", {
+    return fetch("https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/signup/", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email,
-        password,
+        "email": email,
+        "password": password,
       }),
     })
     .then((response) => {
@@ -26,14 +26,14 @@ const signup = (email, password) => {
   };
 
   const login = (email, password) => {
-    return fetch(URL + "/login", {
+    return fetch("https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/login/", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email,
-        password,
+        "email": email,
+        "password": password,
       }),
     })
     .then((response) => {

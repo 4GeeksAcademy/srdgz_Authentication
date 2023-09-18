@@ -16,6 +16,7 @@ import React, {
     const [starships, starshipsAreLoading] = useResources("starships");
     const [favorites, setFavorites] = useState([]);
   
+  
     useEffect(() => {
       const LSFavorites = localStorage.getItem("favorites");
   

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import authService from "../services/authService";
+
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberUser, setRememberUser] = useState(false);
@@ -16,9 +18,11 @@ const LoginPage = () => {
     }
   }, [token]);
 
-  const handleClick = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await loginUser(email, password);
+      const response = await authService.login(email, password);
+      localStorage.setItem("token", response.token)
       setAuthenticated(true);
       navigate("/");
     } catch (error) {
@@ -45,10 +49,10 @@ const LoginPage = () => {
                   className="btn btn-danger w-60 fw-bold px-5 py-2"
                   onClick={handleLogout}
                 >
-                  LOGOUT
+                  Logout
                 </button>
               ) : (
-                <form>
+                <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                   <input
                     type="email"
@@ -106,7 +110,6 @@ const LoginPage = () => {
                   <button
                     type="submit"
                     className="btn btn-warning w-60 fw-bold px-5 py-2"
-                    onClick={handleClick}
                   >
                     SIGN IN
                   </button>

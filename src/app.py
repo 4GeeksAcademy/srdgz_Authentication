@@ -96,11 +96,15 @@ def get_one_user(user_id):
 def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
-    if email != "test" or password != "test":
-        return jsonify({"msg": "Bad email or password"}), 401
-
-    access_token = create_access_token(identity=email)
-    return jsonify(access_token=access_token)
+    # Consulta la base de datos por el nombre de usuario y la contraseña
+    user = User.filter.query(email=email, password=password).first()
+    if User is None:
+          # el usuario no se encontró en la base de datos
+        return jsonify({"msg": "Bad username or password"}), 401
+    
+    # crea un nuevo token con el id de usuario dentro
+    access_token = create_access_token(identity=user.id)
+    return jsonify({ "token": access_token, "user_id": user.id })
 
 #Ruta para inicio de sesión
 @app.route('/login', methods=['POST'])
@@ -112,9 +116,24 @@ def login_user():
     user = User.query.filter_by(email=email).first()
     if not user or user.password != password:
         raise APIException('Invalid email or password', status_code=401) 
+    access_token = create_access_token(identity=user.id)
+    return jsonify({ "token": access_token, "user_id": user.id })
 
+#Ruta para registrar nuevo usuario
+@app.route('/signup', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
 
- 
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"error": "El usuario ya existe"}), 400
+    new_user = User(email=email, password=password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "Usuario creado exitosamente"}), 201
+
 
 @app.route('/user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
