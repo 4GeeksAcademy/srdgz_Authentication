@@ -11,13 +11,23 @@ from api.models import db, User,  Planets, Characters, Starships, Favorites
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from flask_jwt_extended import JWTManager
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+
 
 #from models import Person
+
+
+
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../public/')
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+
+
+app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET', 'sample key')
+jwt = JWTManager(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -81,13 +91,30 @@ def get_one_user(user_id):
          raise APIException('User does not exist', status_code=404)
     return jsonify(chosen_user.serialize()), 200
 
-@app.route('/user', methods=['POST'])
-def create_user():
-    request_body_user = request.get_json()
-    new_user = User(email=request_body_user["email"], password=request_body_user["password"])
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify(request_body_user), 200
+#Ruta para creación de token
+@app.route("/token", methods=["POST"])
+def create_token():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    if email != "test" or password != "test":
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token)
+
+#Ruta para inicio de sesión
+@app.route('/login', methods=['POST'])
+def login_user():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    user = User.query.filter_by(email=email).first()
+    if not user or user.password != password:
+        raise APIException('Invalid email or password', status_code=401) 
+
+
+ 
 
 @app.route('/user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):

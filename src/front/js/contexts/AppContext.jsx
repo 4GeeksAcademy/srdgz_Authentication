@@ -44,7 +44,7 @@ import React, {
         localStorage.setItem("favorites", JSON.stringify(newFavs));
         return newFavs;
       });
-  
+
     const store = {
       people,
       planets,

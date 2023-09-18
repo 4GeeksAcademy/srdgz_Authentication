@@ -1,31 +1,35 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-  const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-  const passwordPattern = /^.{4,}$/;
-
   const [showPassword, setShowPassword] = useState(false);
   const [rememberUser, setRememberUser] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-
-    if (!emailPattern.test(email)) {
-      alert("Please enter a valid email");
-      return;
+  useEffect(() => {
+    if (token && token !== "" && token !== undefined) {
+      setAuthenticated(true);
     }
+  }, [token]);
 
-    if (!passwordPattern.test(password)) {
-      alert(
-        "The password must contain at least 4 characters"
-      );
-      return;
+  const handleClick = async () => {
+    try {
+      await loginUser(email, password);
+      setAuthenticated(true);
+      navigate("/");
+    } catch (error) {
+      console.error("Error en el inicio de sesión:", error);
     }
+  };
 
-    // Aquí va la lógica de inicio de sesión
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setAuthenticated(false);
+    navigate("/login");
   };
 
   return (
@@ -34,8 +38,17 @@ const LoginPage = () => {
         <div className="col-md-6">
           <div className="card">
             <div className="card-body">
-              <h2 className="card-title text-center my-5">Login</h2>
-              <form onSubmit={handleSubmit}>
+            <h2 className="card-title text-center my-5">Login</h2>
+              {authenticated ? (
+                <button
+                  type="button"
+                  className="btn btn-danger w-60 fw-bold px-5 py-2"
+                  onClick={handleLogout}
+                >
+                  LOGOUT
+                </button>
+              ) : (
+                <form>
                 <div className="mb-5">
                   <input
                     type="email"
@@ -44,8 +57,9 @@ const LoginPage = () => {
                     name="email"
                     placeholder="email"
                     required
-                    pattern={emailPattern.source}
                     title="Please enter a valid email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
                 <div className="mb-3">
@@ -57,8 +71,10 @@ const LoginPage = () => {
                       name="password"
                       placeholder="password"
                       required
-                      pattern={passwordPattern.source}
-                      title="The password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters"
+                      minLength="8"
+                      title="The password must contain at least 8 characters"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
                 </div>
@@ -90,12 +106,13 @@ const LoginPage = () => {
                   <button
                     type="submit"
                     className="btn btn-warning w-60 fw-bold px-5 py-2"
+                    onClick={handleClick}
                   >
                     SIGN IN
                   </button>
                 </div>
               </form>
-
+              )}
               <div className="my-4 text-center">
                 <div>
                   <span>Don't have an account? </span>

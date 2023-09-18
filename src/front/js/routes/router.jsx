@@ -16,8 +16,8 @@ const Router = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/Login" element={<LoginPage />} />
-        <Route path="/Signup" element={<SignupPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/:uid" element={<DetailPage />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>

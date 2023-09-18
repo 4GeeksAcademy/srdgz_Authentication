@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { createUser } from "../services/createUser";
+import authService from "../services/authService";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -38,9 +38,10 @@ const SignupPage = () => {
     }
 
     try {
-      const response = await createUser(formData);
+      const response = await authService.signup(email, password);
 
-      if (response.status === 200) {
+      if (response && response.access_token) {
+        localStorage.setItem("token", response.access_token);
         alert("User created successfully");
         navigate("/");
       } else {
@@ -69,7 +70,6 @@ const SignupPage = () => {
                     placeholder="Email"
                     required
                     title="Please enter a valid email"
-                    value={formData.email}
                     onChange={handleChangeEmail}
                   />
                 </div>
@@ -82,8 +82,8 @@ const SignupPage = () => {
                       name="password"
                       placeholder="Password"
                       required
-                      title="The password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters"
-                      value={formData.password}
+                      title="Please enter a valid password"
+                      minLength="8"
                       onChange={handleChangePassword}
                     />
                   </div>
