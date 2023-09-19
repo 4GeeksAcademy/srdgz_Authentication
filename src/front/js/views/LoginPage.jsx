@@ -1,39 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import authService from "../services/authService";
+import useAppContext from "../contexts/AppContext.jsx";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberUser, setRememberUser] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [authenticated, setAuthenticated] = useState(false);
-  const token = localStorage.getItem("token");
+  const {
+    actions: { login },
+  } = useAppContext();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (token && token !== "" && token !== undefined) {
-      setAuthenticated(true);
-    }
-  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await authService.login(email, password);
-      localStorage.setItem("token", response.token)
-      setAuthenticated(true);
-      navigate("/");
-    } catch (error) {
-      console.error("Error en el inicio de sesión:", error);
+    if (email && password) {
+      login(email, password, navigate);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setAuthenticated(false);
-    navigate("/login");
   };
 
   return (
@@ -43,16 +26,7 @@ const LoginPage = () => {
           <div className="card">
             <div className="card-body">
             <h2 className="card-title text-center my-5">Login</h2>
-              {authenticated ? (
-                <button
-                  type="button"
-                  className="btn btn-danger w-60 fw-bold px-5 py-2"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              ) : (
-                <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
                 <div className="mb-5">
                   <input
                     type="email"
@@ -83,7 +57,6 @@ const LoginPage = () => {
                   </div>
                 </div>
                 <div className="form-check mb-5">
-                  <div>
                     <label className="form-check-label" htmlFor="flexCheckDefault">
                       <input
                         className="form-check-input"
@@ -94,17 +67,6 @@ const LoginPage = () => {
                       />
                       Show password
                     </label>
-                  </div>
-                  <div>
-                    <label className="form-check-label" htmlFor="flexCheckDefault">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        onChange={() => setRememberUser(!rememberUser)}
-                      />
-                      Remember me
-                    </label>
-                  </div>
                 </div>
                 <div className="text-center">
                   <button
@@ -115,7 +77,6 @@ const LoginPage = () => {
                   </button>
                 </div>
               </form>
-              )}
               <div className="my-4 text-center">
                 <div>
                   <span>Don't have an account? </span>

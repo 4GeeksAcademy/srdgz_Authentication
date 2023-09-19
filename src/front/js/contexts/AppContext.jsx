@@ -5,8 +5,10 @@ import React, {
     useState,
     useEffect,
   } from "react";
+
   
   import useResources from "../hooks/useResources";
+  import authService from "../services/authService";
   
   const AppContext = createContext();
   
@@ -15,7 +17,14 @@ import React, {
     const [planets, planetsAreLoading] = useResources("planets");
     const [starships, starshipsAreLoading] = useResources("starships");
     const [favorites, setFavorites] = useState([]);
-  
+    const token = localStorage.getItem("token");
+    const [authenticated, setAuthenticated] = useState(false);
+
+    useEffect(() => {
+      if (token && token !== "" && token !== undefined) {
+        setAuthenticated(true);
+      }
+    }, [token]);
   
     useEffect(() => {
       const LSFavorites = localStorage.getItem("favorites");
@@ -29,7 +38,22 @@ import React, {
     const isLoading = useMemo(() => {
       return peopleAreLoading || planetsAreLoading || starshipsAreLoading;
     }, [peopleAreLoading, planetsAreLoading, starshipsAreLoading]);
+
+    const login = async (email, password, navigate) => {
+    try {
+      const response = await authService.login(email, password);
+      localStorage.setItem("token", response.token)
+      setAuthenticated(true);
+      navigate("/");
+    } catch (error) {
+      console.error("Error en el inicio de sesión:", error);
+    }};
   
+    const logout = () => {
+      localStorage.removeItem("token");
+      setAuthenticated(false);
+    };
+
     const addToFavorites = (uid, name) =>
       setFavorites((prev) => {
         localStorage.setItem(
@@ -52,10 +76,13 @@ import React, {
       starships,
       isLoading,
       favorites,
+      token,
     };
     const actions = {
       addToFavorites,
       removeFromFavorites,
+      login,
+      logout,
     };
   
     return (

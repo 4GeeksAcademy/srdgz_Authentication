@@ -1,5 +1,3 @@
-const URL = "https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev";
-
 const signup = (email, password) => {
     return fetch("https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/signup/", {
       method: 'POST',
@@ -14,7 +12,7 @@ const signup = (email, password) => {
     .then((response) => {
       if (response.ok) {
         return response.json().then((data) => {
-          if (data.accessToken) {
+          if (data.access_token) {
             localStorage.setItem("user", JSON.stringify(data));
           }
           return data;
@@ -39,7 +37,7 @@ const signup = (email, password) => {
     .then((response) => {
       if (response.ok) {
         return response.json().then((data) => {
-          if (data.accessToken) {
+          if (data.access_token) {
             localStorage.setItem("user", JSON.stringify(data));
           }
           return data;
