@@ -129,6 +129,7 @@ def create_user():
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
         return jsonify({"error": "El usuario ya existe"}), 400
+   
     new_user = User(email=email, password=password)
     db.session.add(new_user)
     db.session.commit()

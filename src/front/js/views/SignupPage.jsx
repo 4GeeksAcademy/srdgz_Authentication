@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import authService from "../services/authService";
+import useAppContext from "../contexts/AppContext.jsx";
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -10,6 +10,9 @@ const SignupPage = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const {
+    actions: { signup },
+  } = useAppContext();
 
   const handleChangeEmail = (e) => {
     const email = e.target.value;
@@ -30,24 +33,8 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
-    if (!email || !password) {
-      alert("Please enter both email and password");
-      return;
-    }
-
-    try {
-      const response = await authService.signup(email, password);
-
-      if (response && response.token) {
-        localStorage.setItem("token", response.token);
-        alert("User created successfully");
-        navigate("/");
-      } else {
-        alert("Error registering user");
-      }
-    } catch (error) {
-      console.error("Error registering user:", error);
-      alert("Error registering user");
+    if (email && password) {
+      signup(email, password, navigate);
     }
   };
 
@@ -114,7 +101,7 @@ const SignupPage = () => {
                 <div>
                   <span>Already have an account? </span>
                   <Link
-                    to="/Login"
+                    to="/login"
                     className="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fw-bold"
                   >
                     Log In

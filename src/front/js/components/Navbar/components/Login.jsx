@@ -18,7 +18,7 @@ const Login = () => {
           <i className="fa-regular fa-user pe-2"></i>LOGOUT
         </button>
       ) : (
-        <Link to="/Login" className="btn btn-dark fw-bold me-3 my-3">
+        <Link to="/login" className="btn btn-dark fw-bold me-3 my-3">
           <i className="fa-regular fa-user pe-2"></i>LOGIN
         </Link>
       )}

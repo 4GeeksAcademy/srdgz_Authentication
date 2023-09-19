@@ -54,6 +54,25 @@ import React, {
       setAuthenticated(false);
     };
 
+    const signup = async (email, password, navigate) => {
+      if (!email || !password) {
+        alert("Please enter both email and password");
+        return;
+      }
+      try {
+        const response = await authService.signup(email, password);
+        if (response) {
+          alert("User created successfully. Now you can log in");
+          navigate("/login");
+        } else {
+          alert("Error registering user");
+        }
+      } catch (error) {
+        console.error("Error registering user:", error);
+        alert("Error registering user");
+      }
+    };
+
     const addToFavorites = (uid, name) =>
       setFavorites((prev) => {
         localStorage.setItem(
@@ -83,6 +102,7 @@ import React, {
       removeFromFavorites,
       login,
       logout,
+      signup,
     };
   
     return (

@@ -11,12 +11,7 @@ const signup = (email, password) => {
     })
     .then((response) => {
       if (response.ok) {
-        return response.json().then((data) => {
-          if (data.access_token) {
-            localStorage.setItem("user", JSON.stringify(data));
-          }
-          return data;
-        });
+        return response.json();
       } else {
         throw new Error('Network response was not ok');
       }
