@@ -6,9 +6,10 @@ import React, {
     useEffect,
   } from "react";
 
-  
   import useResources from "../hooks/useResources";
   import authService from "../services/authService";
+
+  import toast from "react-hot-toast";
   
   const AppContext = createContext();
   
@@ -46,7 +47,7 @@ import React, {
       setAuthenticated(true);
       navigate("/");
     } catch (error) {
-      console.error("Error en el inicio de sesión:", error);
+      console.error("Login failed: ", error);
     }};
   
     const logout = () => {
@@ -56,20 +57,20 @@ import React, {
 
     const signup = async (email, password, navigate) => {
       if (!email || !password) {
-        alert("Please enter both email and password");
+        toast.error("Please enter both email and password");
         return;
       }
       try {
         const response = await authService.signup(email, password);
         if (response) {
-          alert("User created successfully. Now you can log in");
+          toast.success("User created successfully. Now you can log in");
           navigate("/login");
         } else {
-          alert("Error registering user");
+          toast.error("Error registering user");
         }
       } catch (error) {
         console.error("Error registering user:", error);
-        alert("Error registering user");
+        toast.error("Error registering user");
       }
     };
 

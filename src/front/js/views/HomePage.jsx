@@ -8,9 +8,11 @@ import classes from "./HomePage.module.css";
 const HomePage = () => {
   const { store } = useAppContext();
   const { isLoading } = store;
+
   if (isLoading) {
     return <div className={classes.loader}></div>;
   }
+  
   return (
     <main className="container">
       <Section resourceType="people" target="people" title="Characters" />

@@ -23,6 +23,7 @@ const Card = ({
     actions: { addToFavorites, removeFromFavorites },
   } = useAppContext();
   const isFavorite = favorites.some((items) => items.uid === uid);
+  
   return (
     <div
       className="card text-bg-dark border-light"

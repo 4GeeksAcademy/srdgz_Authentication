@@ -3,16 +3,21 @@ import React from "react";
 import useAppContext from "../../../contexts/AppContext.jsx";
 
 const Dropdown = () => {
+  const {
+    store: { favorites, token },
+    actions: { removeFromFavorites },
+  } = useAppContext();
+
   function counterFavorites() {
     favorites.length;
     if (favorites.length >= 1) return favorites.length;
     else return 0;
   }
-
-  const {
-    store: { favorites },
-    actions: { removeFromFavorites },
-  } = useAppContext();
+ 
+  if (!token) {
+    return null;
+  }
+  
   return (
     <div className="">
       <div className="dropdown">
