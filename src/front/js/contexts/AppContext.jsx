@@ -57,20 +57,28 @@ import React, {
 
     const signup = async (email, password, navigate) => {
       if (!email || !password) {
-        toast.error("Please enter both email and password");
+        toast.error("Please enter both email and password", {
+          duration: 4000,
+        });
         return;
       }
       try {
         const response = await authService.signup(email, password);
         if (response) {
-          toast.success("User created successfully. Now you can log in");
+          toast.success("Successfully registered user.\nThe force is with you.\nNow, you can log in", {
+            duration: 5000,
+          });
           navigate("/login");
         } else {
-          toast.error("Error registering user");
+          toast.error("Help me, Obi-Wan Kenobi. You are my only hope", {
+            duration: 5000,
+          });
         }
       } catch (error) {
         console.error("Error registering user:", error);
-        toast.error("Error registering user");
+        toast.error("Help me, Obi-Wan Kenobi. You are my only hope", {
+          duration: 5000,
+        });
       }
     };
 

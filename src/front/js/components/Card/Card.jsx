@@ -19,7 +19,7 @@ const Card = ({
   starship_class,
 }) => {
   const {
-    store: { favorites },
+    store: { favorites, token },
     actions: { addToFavorites, removeFromFavorites },
   } = useAppContext();
   const isFavorite = favorites.some((items) => items.uid === uid);
@@ -68,6 +68,7 @@ const Card = ({
           <Link to={`/${uid}`} className="btn btn-outline-light">
             Learn more!
           </Link>
+          {token && (
           <button
             type="button"
             className="btn btn-outline-danger ms-auto"
@@ -83,6 +84,7 @@ const Card = ({
               <i className="fa-regular fa-heart"></i>
             )}
           </button>
+          )}
         </div>
       </div>
     </div>
