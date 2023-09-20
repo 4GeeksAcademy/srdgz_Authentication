@@ -74,8 +74,22 @@ def serve_any_other_file(path):
     return response
 
 
-# user methods
+#Ruta para creación de token
+@app.route("/token", methods=["POST"])
+def create_token():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    # Consulta la base de datos por el nombre de usuario y la contraseña
+    user = User.filter.query(email=email, password=password).first()
+    if User is None:
+          # el usuario no se encontró en la base de datos
+        return jsonify({"msg": "Bad username or password"}), 401
+    # crea un nuevo token con el id de usuario dentro
+    access_token = create_access_token(identity=user.id)
+    return jsonify({ "token": access_token, "user_id": user.id })
 
+
+# Rutas para usuarios
 @app.route('/user', methods=['GET'])
 def get_users():
     users= User.query.all()
@@ -90,51 +104,6 @@ def get_one_user(user_id):
     if chosen_user is None:
          raise APIException('User does not exist', status_code=404)
     return jsonify(chosen_user.serialize()), 200
-
-#Ruta para creación de token
-@app.route("/token", methods=["POST"])
-def create_token():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-    # Consulta la base de datos por el nombre de usuario y la contraseña
-    user = User.filter.query(email=email, password=password).first()
-    if User is None:
-          # el usuario no se encontró en la base de datos
-        return jsonify({"msg": "Bad username or password"}), 401
-    
-    # crea un nuevo token con el id de usuario dentro
-    access_token = create_access_token(identity=user.id)
-    return jsonify({ "token": access_token, "user_id": user.id })
-
-#Ruta para inicio de sesión
-@app.route('/login', methods=['POST'])
-def login_user():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-
-    user = User.query.filter_by(email=email).first()
-    if not user or user.password != password:
-        raise APIException('Invalid email or password', status_code=401) 
-    access_token = create_access_token(identity=user.id)
-    return jsonify({ "token": access_token, "user_id": user.id })
-
-#Ruta para registrar nuevo usuario
-@app.route('/signup', methods=['POST'])
-def create_user():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-
-    existing_user = User.query.filter_by(email=email).first()
-    if existing_user:
-        return jsonify({"error": "El usuario ya existe"}), 400
-   
-    new_user = User(email=email, password=password)
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "Usuario creado exitosamente"}), 201
-
 
 @app.route('/user/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
@@ -158,8 +127,36 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify("User successfully deleted"), 200
 
-# favorites methods
 
+#Ruta para inicio de sesión
+@app.route('/login', methods=['POST'])
+def login_user():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    user = User.query.filter_by(email=email).first()
+    if not user or user.password != password:
+        raise APIException('Invalid email or password', status_code=401) 
+    access_token = create_access_token(identity=user.id)
+    return jsonify({ "token": access_token, "user_id": user.id })
+
+
+#Ruta para registrar nuevo usuario
+@app.route('/signup', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"error": "El usuario ya existe"}), 400
+    new_user = User(email=email, password=password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "Usuario creado exitosamente"}), 201
+
+
+# Rutas para favoritos
 @app.route('/user/<int:user_id>/favorites', methods=['GET'])
 def get_user_favorites(user_id):
     user = User.query.get(user_id)
@@ -243,8 +240,8 @@ def delete_starship_favorite(user_id, starship_id):
     db.session.commit()
     return jsonify("Favorite successfully deleted"), 200
 
-# characters methods
 
+# Rutas para personajes
 @app.route('/characters', methods=['GET'])
 def get_characters():
     characters_query = Characters.query.all()
@@ -277,8 +274,8 @@ def delete_character(character_id):
     db.session.commit()
     return jsonify("Character successfully deleted"), 200
 
-# planets methods
 
+# Rutas para planetas
 @app.route('/planets', methods=['GET'])
 def get_planets():
     planets_query = Planets.query.all()
@@ -311,8 +308,8 @@ def delete_planet(planet_id):
     db.session.commit()
     return jsonify("Planet successfully deleted"), 200
 
-# starships methods
 
+# Rutas para naves
 @app.route('/starhips', methods=['GET'])
 def get_starships():
     starhips_query = Starships.query.all()

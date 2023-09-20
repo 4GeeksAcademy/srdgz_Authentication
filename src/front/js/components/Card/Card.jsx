@@ -71,7 +71,7 @@ const Card = ({
           {token && (
           <button
             type="button"
-            className="btn btn-outline-danger ms-auto"
+            className="btn btn-outline-warning ms-auto"
             onClick={
               isFavorite
                 ? () => removeFromFavorites(uid)

@@ -2,7 +2,7 @@ export const getResourceList = (resource) => {
     return fetch(`https://www.swapi.tech/api/${resource}`)
       .then((res) => {
         if (!res.ok) {
-          throw Error("Ha habido un error con la petición");
+          throw Error("There was an error with the request");
         }
         return res.json();
       })

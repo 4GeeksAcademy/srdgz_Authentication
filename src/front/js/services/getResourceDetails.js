@@ -2,7 +2,7 @@ export const getResourceDetails = (url) => {
     return fetch(url)
       .then((res) => {
         if (!res.ok) {
-          throw Error("Ha habido un error con la petición");
+          throw Error("There was an error with the request");
         }
         return res.json();
       })
