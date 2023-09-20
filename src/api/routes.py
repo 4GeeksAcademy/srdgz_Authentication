@@ -2,9 +2,9 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Characters, Planets, Starships, Favorites
 from api.utils import generate_sitemap, APIException
-
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 
 api = Blueprint('api', __name__)
@@ -245,10 +245,10 @@ def delete_planet(planet_id):
 
 
 # Rutas para naves
-@api.route('/starhips', methods=['GET'])
+@api.route('/starships', methods=['GET'])
 def get_starships():
-    starhips_query = Starships.query.all()
-    results = list(map(lambda item: item.serialize(), starhips_query))
+    starships_query = Starships.query.all()
+    results = list(map(lambda item: item.serialize(), starships_query))
     if results == []:
          raise APIException('There are no starships', status_code=404)
     return jsonify(results), 200
