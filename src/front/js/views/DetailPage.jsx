@@ -21,10 +21,6 @@ const DetailPage = () => {
     "name",
     "url",
     "uid",
-    "created",
-    "edited",
-    "homeworld",
-    "pilots"
   ];
 
   const transformPropertyName = (name) => {

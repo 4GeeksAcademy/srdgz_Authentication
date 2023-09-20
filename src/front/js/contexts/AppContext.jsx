@@ -25,14 +25,17 @@ import React, {
       if (token && token !== "" && token !== undefined) {
         setAuthenticated(true);
       }
-    }, [token]);
+    }, []);
   
     useEffect(() => {
       const LSFavorites = localStorage.getItem("favorites");
-  
       if (LSFavorites) {
-        setFavorites(JSON.parse(LSFavorites));
-        return;
+        try {
+          setFavorites(JSON.parse(LSFavorites));
+        } catch (error) {
+          console.error("Error parsing favorites:", error);
+          localStorage.removeItem("favorites");
+        }
       }
     }, []);
   
@@ -84,21 +87,23 @@ import React, {
       }
     };
 
-    const addToFavorites = (uid, name) =>
+    const addToFavorites = (uid, name) => {
       setFavorites((prev) => {
         const newFavorite = { uid, name };
         const updatedFavorites = [...prev, newFavorite];
-        localStorage.setItem(
-          "favorites",
-          JSON.stringify(updatedFavorites)
-        );
+        const userFavorites = JSON.parse(localStorage.getItem("userFavorites")) || {};
+        userFavorites[uid] = updatedFavorites;
+        localStorage.setItem("userFavorites", JSON.stringify(userFavorites));
         return updatedFavorites;
       });
+    };
   
     const removeFromFavorites = (uid) => {
       setFavorites((prev) => {
         const updatedFavorites = prev.filter((favorite) => favorite.uid !== uid);
-        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+        const userFavorites = JSON.parse(localStorage.getItem("userFavorites")) || {};
+        userFavorites[uid] = updatedFavorites;
+        localStorage.setItem("userFavorites", JSON.stringify(userFavorites));
         return updatedFavorites;
       });
     };
