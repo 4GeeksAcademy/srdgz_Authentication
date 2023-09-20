@@ -18,13 +18,13 @@ const DetailPage = () => {
 
   const propertyNames = Object.keys(targetResource);
   const excludedProperties = [
+    "name",
+    "url",
+    "uid",
     "created",
     "edited",
-    "name",
     "homeworld",
-    "url",
-    "pilots",
-    "uid",
+    "pilots"
   ];
 
   const transformPropertyName = (name) => {

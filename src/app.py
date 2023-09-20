@@ -24,6 +24,7 @@ app.url_map.strict_slashes = False
 app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET', 'sample key')
 jwt = JWTManager(app)
 
+
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:

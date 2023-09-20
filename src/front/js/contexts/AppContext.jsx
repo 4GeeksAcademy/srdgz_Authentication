@@ -53,6 +53,8 @@ import React, {
     const logout = () => {
       localStorage.removeItem("token");
       setAuthenticated(false);
+      setFavorites([]);
+      localStorage.removeItem("favorites");
     };
 
     const signup = async (email, password, navigate) => {
@@ -84,19 +86,22 @@ import React, {
 
     const addToFavorites = (uid, name) =>
       setFavorites((prev) => {
+        const newFavorite = { uid, name };
+        const updatedFavorites = [...prev, newFavorite];
         localStorage.setItem(
           "favorites",
-          JSON.stringify([...prev, { uid, name }])
+          JSON.stringify(updatedFavorites)
         );
-        return [...prev, { uid, name }];
+        return updatedFavorites;
       });
   
-    const removeFromFavorites = (uid) =>
+    const removeFromFavorites = (uid) => {
       setFavorites((prev) => {
-        const newFavs = prev.filter((favorite) => favorite.uid !== uid);
-        localStorage.setItem("favorites", JSON.stringify(newFavs));
-        return newFavs;
+        const updatedFavorites = prev.filter((favorite) => favorite.uid !== uid);
+        localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+        return updatedFavorites;
       });
+    };
 
     const store = {
       people,

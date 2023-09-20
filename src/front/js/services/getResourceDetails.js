@@ -1,17 +1,17 @@
 export const getResourceDetails = (url) => {
     return fetch(url)
-      .then((res) => {
-        if (!res.ok) {
+      .then((response) => {
+        if (!response.ok) {
           throw Error("There was an error with the request");
         }
-        return res.json();
+        return response.json();
       })
-      .then((res) => {
+      .then((response) => {
         return {
-          uid: res.result._id,
-          ...res.result.properties,
+          uid: response.result._id,
+          ...response.result.properties,
         };
       })
-      .catch((err) => console.log(err));
+      .catch((error) => console.log(error));
   };
   

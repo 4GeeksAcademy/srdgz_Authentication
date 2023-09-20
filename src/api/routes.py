@@ -177,22 +177,48 @@ def delete_starship_favorite(user_id, starship_id):
 
 
 # Rutas para personajes
-@api.route('/characters', methods=['GET'])
+@api.route('/people', methods=['GET'])
 def get_characters():
-    characters_query = Characters.query.all()
-    results = list(map(lambda item: item.serialize(),characters_query))
-    if results == []:
+    character_query = Characters.query.all()
+    result = {
+        "results": [
+            {
+                'uid': str(character.id),
+                'name': character.name,
+                'url': f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/people/{character.id}"
+            }
+            for character in character_query
+        ]
+    }
+    if not result["results"]:
          raise APIException('There are no characters', status_code=404)
-    return jsonify(results), 200
+    return jsonify(result), 200
 
-@api.route('/characters/<int:character_id>', methods=['GET'])
+@api.route('/people/<int:character_id>', methods=['GET'])
 def character(character_id):
     character_query = Characters.query.filter_by(id= character_id).first()
     if character_query is None:
          raise APIException('The character does not exist', status_code=404)
-    return jsonify(character_query.serialize()), 200
+    result = {
+        "result": {
+            "properties": {
+                "height": character_query.height,
+                "mass": character_query.mass,
+                "hair_color": character_query.hair_color,
+                "skin_color": character_query.skin_color,
+                "eye_color": character_query.eye_color,
+                "birth_year": character_query.birth_year,
+                "gender": character_query.gender,
+                "name": character_query.name,
+                "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/people/{character_query.id}"
+            },
+            "_id": str(character_query.id),
+            "uid": str(character_query.id)
+        }
+    }
+    return jsonify(result), 200
 
-@api.route('/characters', methods=['POST'])
+@api.route('/people', methods=['POST'])
 def create_character():
     request_body_user = request.get_json()
     new_character = Characters(height=request_body_user["height"], mass=request_body_user["mass"], hair_color=request_body_user["hair_color"], skin_color=request_body_user["skin_color"], eye_color=request_body_user["eye_color"], birth_year=request_body_user["birth_year"], gender=request_body_user["gender"], name=request_body_user["name"])
@@ -200,7 +226,7 @@ def create_character():
     db.session.commit()
     return jsonify(request_body_user), 200
 
-@api.route('/characters/<int:character_id>', methods=['DELETE'])
+@api.route('/people/<int:character_id>', methods=['DELETE'])
 def delete_character(character_id):
     chosen_character = Characters.query.get(character_id)
     if chosen_character is None:
@@ -213,18 +239,46 @@ def delete_character(character_id):
 # Rutas para planetas
 @api.route('/planets', methods=['GET'])
 def get_planets():
-    planets_query = Planets.query.all()
-    results = list(map(lambda item: item.serialize(),planets_query))
-    if results == []:
+    planet_query = Planets.query.all()
+    result = {
+        "results": [
+            {
+                'uid': str(planet.id),
+                'name': planet.name,
+                'url': f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/planets/{planet.id}"
+            }
+            for planet in planet_query
+        ]
+    }
+    if not result["results"]:
          raise APIException('There are no planets', status_code=404)
-    return jsonify(results), 200
+    return jsonify(result), 200
 
 @api.route('/planets/<int:planet_id>', methods=['GET'])
 def planet(planet_id):
-    planet_query = Planets.query.filter_by(id= planet_id).first()
+    planet_query = Planets.query.filter_by(id=planet_id).first()
     if planet_query is None:
-         raise APIException('The planet does not exist', status_code=404)
-    return jsonify(planet_query.serialize()), 200
+        raise APIException('The planet does not exist', status_code=404)
+    result = {
+        "result": {
+            "properties": {
+                "name": planet_query.name,
+                "rotation_period": planet_query.rotation_period,
+                "orbital_period": planet_query.orbital_period,
+                "diameter": planet_query.diameter,
+                "climate": planet_query.climate,
+                "gravity": planet_query.gravity,
+                "terrain": planet_query.terrain,
+                "surface_water": planet_query.surface_water,
+                "population": planet_query.population,
+                "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/planets/{planet_query.id}"
+            },
+            "_id": str(planet_query.id),
+            "uid": str(planet_query.id),
+        }
+    }
+
+    return jsonify(result), 200
 
 @api.route('/planets', methods=['POST'])
 def create_planet():
@@ -247,18 +301,50 @@ def delete_planet(planet_id):
 # Rutas para naves
 @api.route('/starships', methods=['GET'])
 def get_starships():
-    starships_query = Starships.query.all()
-    results = list(map(lambda item: item.serialize(), starships_query))
-    if results == []:
+    starship_query = Starships.query.all()
+    result = {
+        "results": [
+            {
+                'uid': str(starship.id),
+                'name': starship.name,
+                'url': f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/starships/{starship.id}"
+            }
+            for starship in starship_query
+        ]
+    }
+    if not result["results"]:
          raise APIException('There are no starships', status_code=404)
-    return jsonify(results), 200
+    return jsonify(result), 200
 
 @api.route('/starships/<int:starship_id>', methods=['GET'])
 def starship(starship_id):
-    starship_query = Starships.query.filter_by(id= starship_id).first()
+    starship_query = Starships.query.filter_by(id=starship_id).first()
     if starship_query is None:
         raise APIException('The starship does not exist', status_code=404)
-    return jsonify(starship_query.serialize()), 200 
+    result = {
+        "result": {
+            "properties": {
+                "name": starship_query.name,
+                "model": starship_query.model,
+                "manufacturer": starship_query.manufacturer,
+                "cost_in_credits": starship_query.cost_in_credits,
+                "length": starship_query.length,
+                "max_atmosphering_speed": starship_query.max_atmosphering_speed,
+                "crew": starship_query.crew,
+                "passengers": starship_query.passengers,
+                "cargo_capacity": starship_query.cargo_capacity,
+                "consumables": starship_query.consumables,
+                "hyperdrive_rating": starship_query.hyperdrive_rating,
+                "MGLT": starship_query.MGLT,
+                "starship_class": starship_query.starship_class,
+                "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/starships/{starship_query.id}"
+            },
+            "_id": str(starship_query.id),
+            "uid": str(starship_query.id)
+        }
+    }
+
+    return jsonify(result), 200
 
 @api.route('/starships', methods=['POST'])
 def create_starship():
