@@ -1,6 +1,6 @@
 import React from "react";
 
-const StarshipsDetails = ({ model, starship_class }) => {
+const StarshipsDetails = ({ model, passengers }) => {
   return (
     <>
       <p>
@@ -8,8 +8,8 @@ const StarshipsDetails = ({ model, starship_class }) => {
         {model}
       </p>
       <p>
-        <strong>Class: </strong>
-        {starship_class}
+        <strong>Passengers: </strong>
+        {passengers}
       </p>
     </>
   );

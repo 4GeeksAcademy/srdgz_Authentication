@@ -5,7 +5,7 @@ import useAppContext from "../../contexts/AppContext.jsx";
 
 import PeopleDetails from "./components/PeopleDetails.jsx";
 import PlanetsDetails from "./components/PlanetsDetails.jsx";
-import StarshipsDetails from "./components/PeopleDetails.jsx";
+import StarshipsDetails from "./components/StarshipsDetails.jsx";
 
 const Card = ({
   uid,
@@ -16,7 +16,7 @@ const Card = ({
   gravity,
   population,
   model,
-  starship_class,
+  passengers,
 }) => {
   const {
     store: { favorites, token },
@@ -62,7 +62,7 @@ const Card = ({
           <PlanetsDetails population={population} gravity={gravity} />
         )}
         {resourceType === "starships" && (
-          <StarshipsDetails model={model} starship_class={starship_class} />
+          <StarshipsDetails model={model} passengers={passengers} />
         )}
         <div className="d-flex justify-between">
           <Link to={`/${uid}`} className="btn btn-outline-light">
