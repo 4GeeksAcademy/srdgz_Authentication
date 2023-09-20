@@ -76,7 +76,7 @@ const DetailPage = () => {
               Lorem Ipsum.
             </p>
           </div>
-          <div className="container table-sm table-responsive-lg">
+          <div className="container table-responsive">
             <table className="table table-dark">
               <thead>
                 <tr>
