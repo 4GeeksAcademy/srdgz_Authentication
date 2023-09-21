@@ -6,6 +6,7 @@ from api.models import db, User, Characters, Planets, Starships, Favorites
 from api.utils import generate_sitemap, APIException
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
+import random
 
 api = Blueprint('api', __name__)
 
@@ -199,6 +200,7 @@ def character(character_id):
     character_query = Characters.query.filter_by(id= character_id).first()
     if character_query is None:
          raise APIException('The character does not exist', status_code=404)
+    people_new_id = random.randint(1000, 10000)
     result = {
         "result": {
             "properties": {
@@ -212,7 +214,7 @@ def character(character_id):
                 "name": character_query.name,
                 "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/people/{character_query.id}"
             },
-            "_id": str(character_query.id),
+            "_id": str(people_new_id),
             "uid": str(character_query.id)
         }
     }
@@ -259,6 +261,7 @@ def planet(planet_id):
     planet_query = Planets.query.filter_by(id=planet_id).first()
     if planet_query is None:
         raise APIException('The planet does not exist', status_code=404)
+    planet_new_id = random.randint(1000, 10000)
     result = {
         "result": {
             "properties": {
@@ -273,7 +276,7 @@ def planet(planet_id):
                 "population": planet_query.population,
                 "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/planets/{planet_query.id}"
             },
-            "_id": str(planet_query.id),
+            "_id": str(planet_new_id),
             "uid": str(planet_query.id),
         }
     }
@@ -321,6 +324,7 @@ def starship(starship_id):
     starship_query = Starships.query.filter_by(id=starship_id).first()
     if starship_query is None:
         raise APIException('The starship does not exist', status_code=404)
+    starship_new_id = random.randint(1000, 10000)
     result = {
         "result": {
             "properties": {
@@ -339,7 +343,7 @@ def starship(starship_id):
                 "starship_class": starship_query.starship_class,
                 "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/starships/{starship_query.id}"
             },
-            "_id": str(starship_query.id),
+            "_id": str(starship_new_id),
             "uid": str(starship_query.id)
         }
     }

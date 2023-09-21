@@ -1,8 +1,8 @@
 import { getResourceList } from "./getResourceList";
 import { getResourceDetails } from "./getResourceDetails";
 
-export const getAllDetails = (resource) => {
-  return getResourceList(resource)
+export const getAllDetails = (resourceType) => {
+  return getResourceList(resourceType)
     .then((resourceList) => {
       return Promise.all(
         resourceList.map((resource) => {

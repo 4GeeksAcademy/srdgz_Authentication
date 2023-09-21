@@ -8,7 +8,7 @@ export const getResourceDetails = (url) => {
       })
       .then((response) => {
         return {
-          uid: response.result._id,
+           uid: response.result_id,
           ...response.result.properties,
         };
       })
