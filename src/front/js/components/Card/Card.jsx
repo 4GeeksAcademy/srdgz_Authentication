@@ -65,7 +65,7 @@ const Card = ({
           <StarshipsDetails model={model} passengers={passengers} />
         )}
         <div className="d-flex justify-between">
-          <Link to={`/${resourceType}/${uid}`} className="btn btn-outline-light">
+          <Link to={`/${uid}`} className="btn btn-outline-light">
             Learn more!
           </Link>
           {token && (

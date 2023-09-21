@@ -21,13 +21,12 @@ export const AppContextProvider = ({ children }) => {
   const token = localStorage.getItem("token");
   const [authenticated, setAuthenticated] = useState(false);
   const userId = localStorage.getItem("userId");
-  const userFavorites = JSON.parse(localStorage.getItem(`userFavorites_${userId}`)) || [];
 
   useEffect(() => {
     if (token && token !== "" && token !== undefined) {
       setAuthenticated(true);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     const LSFavorites = localStorage.getItem(`userFavorites_${userId}`);
@@ -74,6 +73,7 @@ export const AppContextProvider = ({ children }) => {
           duration: 5000,
         });
         navigate("/login");
+        localStorage.setItem(`userFavorites_${userId}`, JSON.stringify([]));
       } else {
         toast.error("Help me, Obi-Wan Kenobi. You are my only hope", {
           duration: 5000,
@@ -95,6 +95,7 @@ export const AppContextProvider = ({ children }) => {
       return updatedFavorites;
     });
   };
+  
 
   const removeFromFavorites = (uid) => {
     setFavorites((prev) => {

@@ -7,6 +7,6 @@ export const getResourceList = (resourceType) => {
         }
         return response.json();
       })
-      .then((response) => response.results)
+      .then((data) => data)
       .catch((error) => console.log(error));
   };

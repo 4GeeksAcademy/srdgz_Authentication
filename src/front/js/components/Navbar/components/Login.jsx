@@ -13,7 +13,7 @@ const Login = () => {
     <div className="ms-auto">
       {token ? ( 
         <button
-          className="btn btn-dark fw-bold me-3 my-3"
+          className="btn btn-dark fw-bold me-3 my-3 text-warning"
           onClick={logout}
         >
           <i className="fa-regular fa-user pe-2"></i>LOGOUT

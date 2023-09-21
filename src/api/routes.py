@@ -6,23 +6,21 @@ from api.models import db, User, Characters, Planets, Starships, Favorites
 from api.utils import generate_sitemap, APIException
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
-import random
-
 api = Blueprint('api', __name__)
 
 #Ruta para creación de token
-@api.route("/token", methods=["POST"])
+@api.route('/token', methods=['POST'])
 def create_token():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
     # Consulta la base de datos por el nombre de usuario y la contraseña
     user = User.filter.query(email=email, password=password).first()
     if User is None:
           # el usuario no se encontró en la base de datos
-        return jsonify({"msg": "Bad username or password"}), 401
+        return jsonify({'Bad username or password'}), 401
     # crea un nuevo token con el id de usuario dentro
     access_token = create_access_token(identity=user.id)
-    return jsonify({ "token": access_token, "user_id": user.id })
+    return jsonify({ 'token': access_token, 'user_id': user.id })
 
 
 # Rutas para usuarios
@@ -47,12 +45,12 @@ def update_user(user_id):
     chosen_user = User.query.get(user_id)
     if chosen_user is None:
         raise APIException('User not found', status_code=404)
-    if "password" in request_body_user:
-        chosen_user.password = request_body_user["password"]
-    if "email" in request_body_user:
-        chosen_user.email = request_body_user["email"]
+    if 'password' in request_body_user:
+        chosen_user.password = request_body_user['password']
+    if 'email' in request_body_user:
+        chosen_user.email = request_body_user['email']
     db.session.commit()
-    return jsonify(request_body_user), 200
+    return jsonify('User successfully updated'), 200
 
 @api.route('/user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
@@ -61,7 +59,7 @@ def delete_user(user_id):
         raise APIException('User not found', status_code=404)
     db.session.delete(chosen_user)
     db.session.commit()
-    return jsonify("User successfully deleted"), 200
+    return jsonify('User successfully deleted'), 200
 
 
 #Ruta para inicio de sesión
@@ -74,7 +72,7 @@ def login_user():
     if not user or user.password != password:
         raise APIException('Invalid email or password', status_code=401) 
     access_token = create_access_token(identity=user.id)
-    return jsonify({ "token": access_token, "user_id": user.id })
+    return jsonify({ 'token': access_token, 'user_id': user.id })
 
 
 #Ruta para registrar nuevo usuario
@@ -85,11 +83,11 @@ def create_user():
     password = data.get('password')
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
-        return jsonify({"error": "El usuario ya existe"}), 400
+        return jsonify({'message':'User already exists'}), 400
     new_user = User(email=email, password=password)
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({"message": "Usuario creado exitosamente"}), 201
+    return jsonify({'message':'User successfully created'}), 201
 
 
 # Rutas para favoritos
@@ -104,77 +102,45 @@ def get_user_favorites(user_id):
     serialized_favorites = [favorite.serialize() for favorite in user_favorites]
     return jsonify(serialized_favorites), 200
 
-@api.route('/user/<int:user_id>/favorites/characters/<int:character_id>', methods=['POST'])
-def add_character_favorite(user_id, character_id):
+@api.route('/favorites', methods=['POST'])
+def add_favorite():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    resource_type = data.get('resource_type')
+    resource_id = data.get('resource_id')
     user = User.query.get(user_id)
     if not user:
         raise APIException('User not found', status_code=404)
-    character = Characters.query.get(character_id)
-    if not character:
-        raise APIException('Character not found', status_code=404)
-    if Favorites.query.filter_by(user_id=user_id, character_id=character_id).first():
-        raise APIException('The character is already on the favorites list', status_code=400)
-    favorite = Favorites(user_id=user_id, character_id=character_id)
+    if not resource_type or not resource_id:
+        raise APIException('Invalid request data', status_code=400)
+    if resource_type not in ['people', 'planets', 'starships']:
+        raise APIException('Invalid resource type', status_code=400)
+    if resource_type == 'people':
+        favorite = Favorites.query.filter_by(user_id=user_id, character_id=resource_id).first()
+    if resource_type == 'planets':
+        favorite = Favorites.query.filter_by(user_id=user_id, planet_id=resource_id).first()
+    if resource_type == 'starships':
+        favorite = Favorites.query.filter_by(user_id=user_id, starship_id=resource_id).first()
+    if favorite:
+        raise APIException('The item is already on the favorites list', status_code=400)
+    if resource_type == 'people':
+        favorite = Favorites(user_id=user_id, character_id=resource_id)
+    if resource_type == 'planets':
+        favorite = Favorites(user_id=user_id, planet_id=resource_id)
+    if resource_type == 'starships':
+        favorite = Favorites(user_id=user_id, starship_id=resource_id)
     db.session.add(favorite)
     db.session.commit()
-    return jsonify("Character added to favorites successfully"), 200
+    return jsonify('Favorite successfully added'), 200
 
-@api.route('/user/<int:user_id>/favorites/characters/<int:character_id>', methods=['DELETE'])
-def delete_character_favorite(user_id, character_id):
-    favorite = Favorites.query.filter_by(user_id=user_id, character_id=character_id).first()
+@api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+def delete_favorite(favorite_id):
+    favorite = Favorites.query.get(favorite_id)
     if not favorite:
         raise APIException('Favorite not found', status_code=404)
     db.session.delete(favorite)
     db.session.commit()
-    return jsonify("Favorite successfully deleted"), 200
-
-@api.route('/user/<int:user_id>/favorites/planets/<int:planet_id>', methods=['POST'])
-def add_planet_favorite(user_id, planet_id):
-    user = User.query.get(user_id)
-    if not user:
-        raise APIException('User not found', status_code=404)
-    planet = Planets.query.get(planet_id)
-    if not planet:
-        raise APIException('Planet not found', status_code=404)
-    if Favorites.query.filter_by(user_id=user_id, planet_id=planet_id).first():
-        raise APIException('The planet is already on the favorites list', status_code=400)
-    favorite = Favorites(user_id=user_id, planet_id=planet_id)
-    db.session.add(favorite)
-    db.session.commit()
-    return jsonify("Planet added to favorites successfully"), 200
-
-@api.route('/user/<int:user_id>/favorites/planets/<int:planet_id>', methods=['DELETE'])
-def delete_planet_favorite(user_id, planet_id):
-    favorite = Favorites.query.filter_by(user_id=user_id, planet_id=planet_id).first()
-    if not favorite:
-        raise APIException('Favorite not found', status_code=404)
-    db.session.delete(favorite)
-    db.session.commit()
-    return jsonify("Favorite successfully deleted"), 200
-    
-@api.route('/user/<int:user_id>/favorites/starships/<int:starship_id>', methods=['POST'])
-def add_starship_favorite(user_id, starship_id):
-    user = User.query.get(user_id)
-    if not user:
-        raise APIException('User not found', status_code=404)
-    starship = Starships.query.get(starship_id)
-    if not starship:
-        raise APIException('Starship not found', status_code=404)
-    if Favorites.query.filter_by(user_id=user_id, starship_id=starship_id).first():
-        raise APIException('The planet is already on the favorites list', status_code=400)
-    favorite = Favorites(user_id=user_id, starship_id=starship_id)
-    db.session.add(favorite)
-    db.session.commit()
-    return jsonify("Starship added to favorites successfully"), 200
-
-@api.route('/user/<int:user_id>/favorites/starships/<int:starship_id>', methods=['DELETE'])
-def delete_starship_favorite(user_id, starship_id):
-    favorite = Favorites.query.filter_by(user_id=user_id, starship_id=starship_id).first()
-    if not favorite:
-        raise APIException('Favorite not found', status_code=404)
-    db.session.delete(favorite)
-    db.session.commit()
-    return jsonify("Favorite successfully deleted"), 200
+    return jsonify('Favorite successfully deleted'), 200
 
 
 # Rutas para personajes
@@ -182,16 +148,16 @@ def delete_starship_favorite(user_id, starship_id):
 def get_characters():
     character_query = Characters.query.all()
     result = {
-        "results": [
+        'results': [
             {
                 'uid': str(character.id),
                 'name': character.name,
-                'url': f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/people/{character.id}"
+                'url': f'https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/people/{character.id}'
             }
             for character in character_query
         ]
     }
-    if not result["results"]:
+    if not result['results']:
          raise APIException('There are no characters', status_code=404)
     return jsonify(result), 200
 
@@ -200,22 +166,20 @@ def character(character_id):
     character_query = Characters.query.filter_by(id= character_id).first()
     if character_query is None:
          raise APIException('The character does not exist', status_code=404)
-    people_new_id = random.randint(1000, 10000)
     result = {
-        "result": {
-            "properties": {
-                "height": character_query.height,
-                "mass": character_query.mass,
-                "hair_color": character_query.hair_color,
-                "skin_color": character_query.skin_color,
-                "eye_color": character_query.eye_color,
-                "birth_year": character_query.birth_year,
-                "gender": character_query.gender,
-                "name": character_query.name,
-                "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/people/{character_query.id}"
+        'result': {
+            'properties': {
+                'height': character_query.height,
+                'mass': character_query.mass,
+                'hair_color': character_query.hair_color,
+                'skin_color': character_query.skin_color,
+                'eye_color': character_query.eye_color,
+                'birth_year': character_query.birth_year,
+                'gender': character_query.gender,
+                'name': character_query.name,
+                'url': f'https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/people/{character_query.id}'
             },
-            "_id": str(people_new_id),
-            "uid": str(character_query.id)
+            'uid': str(character_query.id)
         }
     }
     return jsonify(result), 200
@@ -223,7 +187,7 @@ def character(character_id):
 @api.route('/people', methods=['POST'])
 def create_character():
     request_body_user = request.get_json()
-    new_character = Characters(height=request_body_user["height"], mass=request_body_user["mass"], hair_color=request_body_user["hair_color"], skin_color=request_body_user["skin_color"], eye_color=request_body_user["eye_color"], birth_year=request_body_user["birth_year"], gender=request_body_user["gender"], name=request_body_user["name"])
+    new_character = Characters(height=request_body_user['height'], mass=request_body_user['mass'], hair_color=request_body_user['hair_color'], skin_color=request_body_user['skin_color'], eye_color=request_body_user['eye_color'], birth_year=request_body_user['birth_year'], gender=request_body_user['gender'], name=request_body_user['name'])
     db.session.add(new_character)
     db.session.commit()
     return jsonify(request_body_user), 200
@@ -235,7 +199,7 @@ def delete_character(character_id):
         raise APIException('Character not found', status_code=404)
     db.session.delete(chosen_character)
     db.session.commit()
-    return jsonify("Character successfully deleted"), 200
+    return jsonify('Character successfully deleted'), 200
 
 
 # Rutas para planetas
@@ -243,16 +207,16 @@ def delete_character(character_id):
 def get_planets():
     planet_query = Planets.query.all()
     result = {
-        "results": [
+        'results': [
             {
                 'uid': str(planet.id),
                 'name': planet.name,
-                'url': f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/planets/{planet.id}"
+                'url': f'https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/planets/{planet.id}'
             }
             for planet in planet_query
         ]
     }
-    if not result["results"]:
+    if not result['results']:
          raise APIException('There are no planets', status_code=404)
     return jsonify(result), 200
 
@@ -261,23 +225,21 @@ def planet(planet_id):
     planet_query = Planets.query.filter_by(id=planet_id).first()
     if planet_query is None:
         raise APIException('The planet does not exist', status_code=404)
-    planet_new_id = random.randint(1000, 10000)
     result = {
-        "result": {
-            "properties": {
-                "name": planet_query.name,
-                "rotation_period": planet_query.rotation_period,
-                "orbital_period": planet_query.orbital_period,
-                "diameter": planet_query.diameter,
-                "climate": planet_query.climate,
-                "gravity": planet_query.gravity,
-                "terrain": planet_query.terrain,
-                "surface_water": planet_query.surface_water,
-                "population": planet_query.population,
-                "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/planets/{planet_query.id}"
+        'result': {
+            'properties': {
+                'name': planet_query.name,
+                'rotation_period': planet_query.rotation_period,
+                'orbital_period': planet_query.orbital_period,
+                'diameter': planet_query.diameter,
+                'climate': planet_query.climate,
+                'gravity': planet_query.gravity,
+                'terrain': planet_query.terrain,
+                'surface_water': planet_query.surface_water,
+                'population': planet_query.population,
+                'url': f'https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/planets/{planet_query.id}'
             },
-            "_id": str(planet_new_id),
-            "uid": str(planet_query.id),
+            'uid': str(planet_query.id),
         }
     }
 
@@ -286,7 +248,7 @@ def planet(planet_id):
 @api.route('/planets', methods=['POST'])
 def create_planet():
     request_body_user = request.get_json()
-    new_planet = Planets(diameter=request_body_user["diameter"], rotation_period=request_body_user["rotation_period"], orbital_period=request_body_user["orbital_period"], gravity=request_body_user["gravity"], population=request_body_user["population"], climate=request_body_user["climate"], terrain=request_body_user["terrain"], surface_water=request_body_user["surface_water"], name=request_body_user["name"])
+    new_planet = Planets(diameter=request_body_user['diameter'], rotation_period=request_body_user['rotation_period'], orbital_period=request_body_user['orbital_period'], gravity=request_body_user['gravity'], population=request_body_user['population'], climate=request_body_user['climate'], terrain=request_body_user['terrain'], surface_water=request_body_user['surface_water'], name=request_body_user['name'])
     db.session.add(new_planet)
     db.session.commit()
     return jsonify(request_body_user), 200
@@ -298,7 +260,7 @@ def delete_planet(planet_id):
         raise APIException('Planet not found', status_code=404)
     db.session.delete(chosen_planet)
     db.session.commit()
-    return jsonify("Planet successfully deleted"), 200
+    return jsonify('Planet successfully deleted'), 200
 
 
 # Rutas para naves
@@ -306,16 +268,16 @@ def delete_planet(planet_id):
 def get_starships():
     starship_query = Starships.query.all()
     result = {
-        "results": [
+        'results': [
             {
                 'uid': str(starship.id),
                 'name': starship.name,
-                'url': f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/starships/{starship.id}"
+                'url': f'https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/starships/{starship.id}'
             }
             for starship in starship_query
         ]
     }
-    if not result["results"]:
+    if not result['results']:
          raise APIException('There are no starships', status_code=404)
     return jsonify(result), 200
 
@@ -324,27 +286,25 @@ def starship(starship_id):
     starship_query = Starships.query.filter_by(id=starship_id).first()
     if starship_query is None:
         raise APIException('The starship does not exist', status_code=404)
-    starship_new_id = random.randint(1000, 10000)
     result = {
-        "result": {
-            "properties": {
-                "name": starship_query.name,
-                "model": starship_query.model,
-                "manufacturer": starship_query.manufacturer,
-                "cost_in_credits": starship_query.cost_in_credits,
-                "length": starship_query.length,
-                "max_atmosphering_speed": starship_query.max_atmosphering_speed,
-                "crew": starship_query.crew,
-                "passengers": starship_query.passengers,
-                "cargo_capacity": starship_query.cargo_capacity,
-                "consumables": starship_query.consumables,
-                "hyperdrive_rating": starship_query.hyperdrive_rating,
-                "MGLT": starship_query.MGLT,
-                "starship_class": starship_query.starship_class,
-                "url": f"https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/starships/{starship_query.id}"
+        'result': {
+            'properties': {
+                'name': starship_query.name,
+                'model': starship_query.model,
+                'manufacturer': starship_query.manufacturer,
+                'cost_in_credits': starship_query.cost_in_credits,
+                'length': starship_query.length,
+                'max_atmosphering_speed': starship_query.max_atmosphering_speed,
+                'crew': starship_query.crew,
+                'passengers': starship_query.passengers,
+                'cargo_capacity': starship_query.cargo_capacity,
+                'consumables': starship_query.consumables,
+                'hyperdrive_rating': starship_query.hyperdrive_rating,
+                'MGLT': starship_query.MGLT,
+                'starship_class': starship_query.starship_class,
+                'url': f'https://automatic-garbanzo-ww4j66rrp7pcggw5-3001.app.github.dev/api/starships/{starship_query.id}'
             },
-            "_id": str(starship_new_id),
-            "uid": str(starship_query.id)
+            'uid': str(starship_query.id)
         }
     }
 
@@ -353,7 +313,7 @@ def starship(starship_id):
 @api.route('/starships', methods=['POST'])
 def create_starship():
     request_body_user = request.get_json()
-    new_starship = Starships(model=request_body_user["model"], starship_class=request_body_user["starship_class"], manufacturer=request_body_user["manufacturer"], cost_in_credits=request_body_user["cost_in_credits"], length=request_body_user["length"], crew=request_body_user["crew"], passengers=request_body_user["passengers"], max_atmosphering_speed=request_body_user["max_atmosphering_speed"], hyperdrive_rating=request_body_user["hyperdrive_rating"], MGLT=request_body_user["MGLT"], cargo_capacity=request_body_user["cargo_capacity"], consumables=request_body_user["consumables"], name=request_body_user["name"])
+    new_starship = Starships(model=request_body_user['model'], starship_class=request_body_user['starship_class'], manufacturer=request_body_user['manufacturer'], cost_in_credits=request_body_user['cost_in_credits'], length=request_body_user['length'], crew=request_body_user['crew'], passengers=request_body_user['passengers'], max_atmosphering_speed=request_body_user['max_atmosphering_speed'], hyperdrive_rating=request_body_user['hyperdrive_rating'], MGLT=request_body_user['MGLT'], cargo_capacity=request_body_user['cargo_capacity'], consumables=request_body_user['consumables'], name=request_body_user['name'])
     db.session.add(new_starship)
     db.session.commit()
     return jsonify(request_body_user), 200
@@ -365,4 +325,4 @@ def delete_starship(starship_id):
         raise APIException('Starship not found', status_code=404)
     db.session.delete(chosen_starship)
     db.session.commit()
-    return jsonify("Starship successfully deleted"), 200
+    return jsonify('Starship successfully deleted'), 200
