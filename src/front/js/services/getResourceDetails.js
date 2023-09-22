@@ -7,7 +7,12 @@ export const getResourceDetails = (resourceType, uid) => {
         }
         return response.json();
       })
-      .then((response) => response.result)
+      .then((data) => {
+        const result = data.result;
+        const properties = result.properties;
+        const uid = result.uid;
+        return { properties, uid };
+      })
       .catch((error) => console.log(error));
   };
   

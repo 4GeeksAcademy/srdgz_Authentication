@@ -9,23 +9,21 @@ const DetailPage = () => {
   const params = useParams();
   const { store } = useAppContext();
   const { people, planets, starships, isLoading } = store;
-  const allResources = [...people, ...planets, ...starships];
-  const targetResource = allResources.find((item) => item.uid === params.uid);
+  const { uid, resourceType } = params;
+  const resourceList =
+  resourceType === "people"
+    ? people
+    : resourceType === "planets"
+    ? planets
+    : starships;
+  const targetResource = resourceList.find((item) => item.uid === uid);
 
-  let resourceType;
-  let resourceImage = "";
-  if (people.find((person) => person.uid == params.uid)) {
-    resourceType = "people";
-    resourceImage =
-      "https://starwars-visualguide.com/assets/img/characters/13.jpg";
-  } else if (planets.find((planet) => planet.uid == params.uid)) {
-    resourceType = "planets";
-    resourceImage = "https://starwars-visualguide.com/assets/img/planets/8.jpg";
-  } else {
-    resourceType = "starships";
-    resourceImage =
-      "https://starwars-visualguide.com/assets/img/starships/10.jpg";
-  }
+  const resourceImage =
+  resourceType === "people"
+    ? "https://starwars-visualguide.com/assets/img/characters/13.jpg"
+    : resourceType === "planets"
+    ? "https://starwars-visualguide.com/assets/img/planets/8.jpg"
+    : "https://starwars-visualguide.com/assets/img/starships/10.jpg";
 
   const excludedProperties = ["name", "url", "uid"];
   const renderDetails = () => {
