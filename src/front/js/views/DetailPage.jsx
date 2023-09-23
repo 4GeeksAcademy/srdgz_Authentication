@@ -9,11 +9,33 @@ const DetailPage = () => {
   const params = useParams();
   const { store } = useAppContext();
   const { people, planets, starships, isLoading } = store;
-  const allResources = [...people, ...planets, ...starships];
-  const targetResource = allResources.find((items) => items.uid == params.uid);
+  const resourceType = params.resourceType;
+  const uid = params.uid;
 
   if (isLoading) {
     return <div className={classes.loader}></div>;
+  }
+
+  let targetResource;
+  let resourceImage = "";
+  switch (resourceType) {
+    case "people":
+      targetResource = people.find((person) => person.uid === uid);
+      resourceImage =
+        "https://starwars-visualguide.com/assets/img/characters/13.jpg";
+      break;
+    case "planets":
+      targetResource = planets.find((planet) => planet.uid === uid);
+      resourceImage =
+        "https://starwars-visualguide.com/assets/img/planets/8.jpg";
+      break;
+    case "starships":
+      targetResource = starships.find((starship) => starship.uid === uid);
+      resourceImage =
+        "https://starwars-visualguide.com/assets/img/starships/10.jpg";
+      break;
+    default:
+      break;
   }
 
   const propertyNames = Object.keys(targetResource);
@@ -29,21 +51,6 @@ const DetailPage = () => {
   const filteredPropertyNames = propertyNames.filter(
     (propertyName) => !excludedProperties.includes(propertyName)
   );
-
-  let resourceType;
-  let resourceImage = "";
-  if (people.find((person) => person.uid == params.uid)) {
-    resourceType = "people";
-    resourceImage =
-      "https://starwars-visualguide.com/assets/img/characters/13.jpg";
-  } else if (planets.find((planet) => planet.uid == params.uid)) {
-    resourceType = "planets";
-    resourceImage = "https://starwars-visualguide.com/assets/img/planets/8.jpg";
-  } else {
-    resourceType = "starships";
-    resourceImage =
-      "https://starwars-visualguide.com/assets/img/starships/10.jpg";
-  }
 
   return (
     <div className="w-100 h-100">
