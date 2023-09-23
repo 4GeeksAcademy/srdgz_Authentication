@@ -41,7 +41,7 @@ const Dropdown = () => {
                     <button
                       type="button"
                       className="btn-close ps-4"
-                      onClick={() => removeFromFavorites(el.uid)}
+                      onClick={() => removeFromFavorites(el.uid, el.resourceType)}
                     ></button>
                   </div>
                 </li>

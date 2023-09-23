@@ -22,7 +22,9 @@ const Card = ({
     store: { favorites, token },
     actions: { addToFavorites, removeFromFavorites },
   } = useAppContext();
-  const isFavorite = favorites.some((items) => items.uid === uid);
+  const isFavorite = favorites.some(
+    (item) => item.uid === uid && item.resourceType === resourceType
+  );
   
   return (
     <div
@@ -74,8 +76,8 @@ const Card = ({
             className="btn btn-outline-warning ms-auto"
             onClick={
               isFavorite
-                ? () => removeFromFavorites(uid)
-                : () => addToFavorites(uid, name)
+                ? () => removeFromFavorites(uid, resourceType)
+                : () => addToFavorites(uid, resourceType, name)
             }
           >
             {isFavorite ? (

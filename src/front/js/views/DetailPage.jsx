@@ -60,7 +60,7 @@ const DetailPage = () => {
             <img
               src={resourceImage}
               className="img-fluid"
-              style={{ width: "400px", height: "400px", objectFit: "cover", }}
+              style={{ width: "400px", height: "400px", objectFit: "cover", borderRadius: "10%" }}
               alt={resourceType}
             />
           </div>

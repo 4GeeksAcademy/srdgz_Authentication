@@ -19,8 +19,9 @@ export const AppContextProvider = ({ children }) => {
   const [starships, starshipsAreLoading] = useResources("starships");
   const [favorites, setFavorites] = useState([]);
   const token = localStorage.getItem("token");
-  const [authenticated, setAuthenticated] = useState(false);
   const userId = localStorage.getItem("userId");
+  const [authenticated, setAuthenticated] = useState(false);
+
 
   useEffect(() => {
     if (token && token !== "" && token !== undefined) {
@@ -44,7 +45,8 @@ export const AppContextProvider = ({ children }) => {
   const login = async (email, password, navigate) => {
   try {
     const response = await authService.login(email, password);
-    localStorage.setItem("token", response.token)
+    localStorage.setItem("token", response.token);
+    localStorage.setItem("userId", response.user_id);
     setAuthenticated(true);
     navigate("/");
   } catch (error) {
@@ -53,6 +55,7 @@ export const AppContextProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     setAuthenticated(false);
   };
 
@@ -84,18 +87,21 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  const addToFavorites = (uid, name) =>
-    setFavorites((prev) => {
-      localStorage.setItem(
-        "favorites",
-        JSON.stringify([...prev, { uid, name }])
-      );
-      return [...prev, { uid, name }];
-    });
+  const addToFavorites = (uid, resourceType, name) =>
+  setFavorites((prev) => {
+    const newFavorite = { uid, name, resourceType };
+    localStorage.setItem(
+      "favorites",
+      JSON.stringify([...prev, newFavorite])
+    );
+    return [...prev, newFavorite];
+  });
 
-  const removeFromFavorites = (uid) =>
+  const removeFromFavorites = (uid, resourceType) =>
     setFavorites((prev) => {
-      const newFavs = prev.filter((favorite) => favorite.uid !== uid);
+      const newFavs = prev.filter(
+        (favorite) => favorite.uid !== uid || favorite.resourceType !== resourceType
+      );
       localStorage.setItem("favorites", JSON.stringify(newFavs));
       return newFavs;
     });
@@ -107,6 +113,7 @@ export const AppContextProvider = ({ children }) => {
     isLoading,
     favorites,
     token,
+    userId,
   };
   const actions = {
     addToFavorites,
