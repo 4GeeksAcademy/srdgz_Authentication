@@ -29,16 +29,13 @@ export const AppContextProvider = ({ children }) => {
   }, [token]);
 
   useEffect(() => {
-    const LSFavorites = localStorage.getItem(`userFavorites_${userId}`);
+    const LSFavorites = localStorage.getItem("favorites");
+
     if (LSFavorites) {
-      try {
-        setFavorites(JSON.parse(LSFavorites));
-      } catch (error) {
-        console.error("Error parsing favorites:", error);
-        localStorage.removeItem(`userFavorites_${userId}`);
-      }
+      setFavorites(JSON.parse(LSFavorites));
+      return;
     }
-  }, [userId]);
+  }, []);
 
   const isLoading = useMemo(() => {
     return peopleAreLoading || planetsAreLoading || starshipsAreLoading;
@@ -87,23 +84,21 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  const addToFavorites = (uid, name) => {
+  const addToFavorites = (uid, name) =>
     setFavorites((prev) => {
-      const newFavorite = { uid, name };
-      const updatedFavorites = [...prev, newFavorite];
-      localStorage.setItem(`userFavorites_${userId}`, JSON.stringify(updatedFavorites));
-      return updatedFavorites;
+      localStorage.setItem(
+        "favorites",
+        JSON.stringify([...prev, { uid, name }])
+      );
+      return [...prev, { uid, name }];
     });
-  };
-  
 
-  const removeFromFavorites = (uid) => {
+  const removeFromFavorites = (uid) =>
     setFavorites((prev) => {
-      const updatedFavorites = prev.filter((favorite) => favorite.uid !== uid);
-      localStorage.setItem(`userFavorites_${userId}`, JSON.stringify(updatedFavorites));
-      return updatedFavorites;
+      const newFavs = prev.filter((favorite) => favorite.uid !== uid);
+      localStorage.setItem("favorites", JSON.stringify(newFavs));
+      return newFavs;
     });
-  };
 
   const store = {
     people,
