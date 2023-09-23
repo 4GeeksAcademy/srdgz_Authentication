@@ -8,6 +8,7 @@ import React, {
 
 import useResources from "../hooks/useResources";
 import authService from "../services/authService";
+import authFavorites from "../services/authFavorites";
 
 import toast from "react-hot-toast";
 
@@ -22,6 +23,9 @@ export const AppContextProvider = ({ children }) => {
   const userId = localStorage.getItem("userId");
   const [authenticated, setAuthenticated] = useState(false);
 
+  const isLoading = useMemo(() => {
+    return peopleAreLoading || planetsAreLoading || starshipsAreLoading;
+  }, [peopleAreLoading, planetsAreLoading, starshipsAreLoading]);
 
   useEffect(() => {
     if (token && token !== "" && token !== undefined) {
@@ -29,6 +33,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [token]);
 
+  /*
   useEffect(() => {
     const LSFavorites = localStorage.getItem("favorites");
 
@@ -37,10 +42,7 @@ export const AppContextProvider = ({ children }) => {
       return;
     }
   }, []);
-
-  const isLoading = useMemo(() => {
-    return peopleAreLoading || planetsAreLoading || starshipsAreLoading;
-  }, [peopleAreLoading, planetsAreLoading, starshipsAreLoading]);
+*/
 
   const login = async (email, password, navigate) => {
   try {
@@ -48,6 +50,9 @@ export const AppContextProvider = ({ children }) => {
     localStorage.setItem("token", response.token);
     localStorage.setItem("userId", response.user_id);
     setAuthenticated(true);
+    const favorites = await authFavorites.getFavoritesFromAPI(response.user_id);
+    console.log(favorites);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
     navigate("/");
   } catch (error) {
     console.error("Login failed: ", error);
@@ -56,6 +61,7 @@ export const AppContextProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("favorites");
     setAuthenticated(false);
   };
 
@@ -87,24 +93,62 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  const addToFavorites = (uid, resourceType, name) =>
-  setFavorites((prev) => {
-    const newFavorite = { uid, name, resourceType };
-    localStorage.setItem(
-      "favorites",
-      JSON.stringify([...prev, newFavorite])
-    );
-    return [...prev, newFavorite];
-  });
-
-  const removeFromFavorites = (uid, resourceType) =>
-    setFavorites((prev) => {
-      const newFavs = prev.filter(
-        (favorite) => favorite.uid !== uid || favorite.resourceType !== resourceType
-      );
-      localStorage.setItem("favorites", JSON.stringify(newFavs));
-      return newFavs;
-    });
+  const addToFavorites = async (resource_id, resource_type, name) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      await authFavorites.addFavoriteToAPI(resource_id, resource_type, userId);
+      let prevFavorites = JSON.parse(localStorage.getItem("favorites"));
+      if (!prevFavorites) {
+        prevFavorites = [];
+      }
+      const newFavorite = { resource_id, name, resource_type };
+      const updatedFavorites = [...prevFavorites, newFavorite];
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      setFavorites(updatedFavorites);
+      toast.success("This is the way", {
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error adding favorite:", error);
+      toast.error("Failed to add favorite. Try again", {
+        duration: 3000,
+      });
+    }
+  };
+  
+  const removeFromFavorites = async (uid, resourceType) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+      const favoriteToRemoveIndex = favorites.findIndex((favorite) => {
+        return favorite.uid === uid && favorite.resourceType === resourceType;
+      });
+      if (favoriteToRemoveIndex === -1) {
+        throw new Error("Favorite not found");
+      }
+      const favoriteToRemove = favorites[favoriteToRemoveIndex];
+      
+      await authFavorites.deleteFavoriteFromAPI(userId, favoriteToRemove.favorite_id);
+      
+      setFavorites((prev) => {
+        const newFavs = [...prev];
+        newFavs.splice(favoriteToRemoveIndex, 1);
+        localStorage.setItem("favorites", JSON.stringify(newFavs));
+        return newFavs;
+      });
+      
+      toast.success("Favorite removed successfully", {
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error removing favorite:", error);
+      toast.error("Failed to remove favorite. Try again", {
+        duration: 3000,
+      });
+    }
+  };
+  
+  
 
   const store = {
     people,

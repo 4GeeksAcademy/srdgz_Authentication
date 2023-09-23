@@ -8,15 +8,11 @@ const Dropdown = () => {
     actions: { removeFromFavorites },
   } = useAppContext();
 
-  function counterFavorites() {
-    favorites.length;
-    if (favorites.length >= 1) return favorites.length;
-    else return 0;
-  }
- 
   if (!token) {
     return null;
   }
+
+  const counterFavorites = favorites ? favorites.length : 0;
   
   return (
     <div className="">
@@ -28,16 +24,15 @@ const Dropdown = () => {
           data-bs-auto-close="outside"
           aria-expanded="false"
         >
-          FAVORITES {counterFavorites()}
+          FAVORITES {counterFavorites}
         </button>
         <ul className="dropdown-menu p-3">
-          {favorites?.length ? (
+          {favorites && favorites.length > 0 ? (
             favorites.map((el) => {
               return (
                 <li key={el.uid}>
                   <div className="d-flex justify-content-between">
                     {el?.name}
-
                     <button
                       type="button"
                       className="btn-close ps-4"

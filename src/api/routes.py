@@ -97,15 +97,14 @@ def get_user_favorites(user_id):
     if not user:
         raise APIException('User not found', status_code=404)
     user_favorites = Favorites.query.filter_by(user_id=user_id).all()
-    if not user_favorites:
-        raise APIException('User has no favorites', status_code=404)
     serialized_favorites = [favorite.serialize() for favorite in user_favorites]
+    if not serialized_favorites:
+        raise APIException('User has no favorites', status_code=404)
     return jsonify(serialized_favorites), 200
 
-@api.route('/favorites', methods=['POST'])
-def add_favorite():
+@api.route('/user/<int:user_id>/favorites', methods=['POST'])
+def add_favorite(user_id):
     data = request.get_json()
-    user_id = data.get('user_id')
     resource_type = data.get('resource_type')
     resource_id = data.get('resource_id')
     user = User.query.get(user_id)
@@ -117,23 +116,23 @@ def add_favorite():
         raise APIException('Invalid resource type', status_code=400)
     if resource_type == 'people':
         favorite = Favorites.query.filter_by(user_id=user_id, character_id=resource_id).first()
-    if resource_type == 'planets':
+    elif resource_type == 'planets':
         favorite = Favorites.query.filter_by(user_id=user_id, planet_id=resource_id).first()
-    if resource_type == 'starships':
+    elif resource_type == 'starships':
         favorite = Favorites.query.filter_by(user_id=user_id, starship_id=resource_id).first()
     if favorite:
         raise APIException('The item is already on the favorites list', status_code=400)
     if resource_type == 'people':
         favorite = Favorites(user_id=user_id, character_id=resource_id)
-    if resource_type == 'planets':
+    elif resource_type == 'planets':
         favorite = Favorites(user_id=user_id, planet_id=resource_id)
-    if resource_type == 'starships':
+    elif resource_type == 'starships':
         favorite = Favorites(user_id=user_id, starship_id=resource_id)
     db.session.add(favorite)
     db.session.commit()
     return jsonify('Favorite successfully added'), 200
 
-@api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+@api.route('/user/<int:user_id>/favorites/<int:favorite_id>', methods=['DELETE'])
 def delete_favorite(favorite_id):
     favorite = Favorites.query.get(favorite_id)
     if not favorite:

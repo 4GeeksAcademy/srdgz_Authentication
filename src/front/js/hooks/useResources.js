@@ -14,13 +14,20 @@ const useResources = (targetResource) => {
       return;
     }
     getAllDetails(targetResource)
-      .then((res) => {
+    .then((res) => {
+      if (Array.isArray(res)) {
         setResources(res);
         localStorage.setItem(targetResource, JSON.stringify(res));
-        setIsLoading(false);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+      } else {
+        console.error(`Unexpected response for ${targetResource}:`, res);
+      }
+      setIsLoading(false);
+    })
+    .catch((err) => {
+      console.error(`Error fetching ${targetResource}:`, err);
+      setIsLoading(false);
+    });
+}, []);
 
   return [resources, isLoading];
 };

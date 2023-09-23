@@ -5,6 +5,7 @@
     color: yellow;
     border: 2px solid;
     position: relative;
+    margin: 4rem;
   }
   .loader::before {
     content: "";
