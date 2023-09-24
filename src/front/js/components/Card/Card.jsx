@@ -22,6 +22,7 @@ const Card = ({
     store: { favorites, token },
     actions: { addToFavorites, removeFromFavorites },
   } = useAppContext();
+  
   let isFavorite = false;
   if (resourceType === "people") {
     isFavorite = Array.isArray(favorites) && favorites.some(

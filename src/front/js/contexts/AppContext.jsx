@@ -52,9 +52,15 @@ export const AppContextProvider = ({ children }) => {
     setAuthenticated(true);
     const favorites = await authFavorites.getFavoritesFromAPI(response.user_id);
     localStorage.setItem("favorites", JSON.stringify(favorites));
+    toast.success("The Force is with you", {
+      duration: 3000,
+    });
     navigate("/");
   } catch (error) {
     console.error("Login failed: ", error);
+    toast.error("Login failed. Please check your email and password", {
+      duration: 4000,
+    });
   }};
 
   const logout = () => {
@@ -62,6 +68,9 @@ export const AppContextProvider = ({ children }) => {
     localStorage.removeItem("userId");
     localStorage.removeItem("favorites");
     setAuthenticated(false);
+    toast.success("May the Force be with you", {
+      duration: 3000,
+    });
   };
 
   const signup = async (email, password, navigate) => {
@@ -74,7 +83,7 @@ export const AppContextProvider = ({ children }) => {
     try {
       const response = await authService.signup(email, password);
       if (response) {
-        toast.success("Successfully registered user.\nThe force is with you.\nNow, you can log in", {
+        toast.success("Welcome to the galaxy\nNow, you can log in", {
           duration: 5000,
         });
         navigate("/login");
@@ -118,7 +127,15 @@ export const AppContextProvider = ({ children }) => {
       const userId = localStorage.getItem("userId");
       let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
       const favoriteToRemoveIndex = favorites.findIndex((favorite) => {
-        return favorite.uid === uid && favorite.resourceType === resourceType;
+        if (resourceType === "people") {
+          return favorite.character_id === Number(uid);
+        }
+        if (resourceType === "planets") {
+          return favorite.planet_id === Number(uid);
+        }
+        if (resourceType === "starships") {
+          return favorite.starship_id === Number(uid);
+        }
       });
       if (favoriteToRemoveIndex === -1) {
         throw new Error("Favorite not found");

@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import useAppContext from "../../../contexts/AppContext.jsx";
 
 const Dropdown = () => {
   const {
-    store: { favorites, token },
+    store: { favorites, token, people, planets, starships },
     actions: { removeFromFavorites },
   } = useAppContext();
 
@@ -29,14 +29,38 @@ const Dropdown = () => {
         <ul className="dropdown-menu p-3">
           {favorites && favorites.length > 0 ? (
             favorites.map((el) => {
+              let uid = 0;
+              let name = "";
+              let resourceType = "";
+              let fav;
+              {
+                if (el.character_id != null) {
+                  uid = el.character_id;
+                  fav = Array.from(people).find((item) => Number(item.uid) === uid);
+                  name = fav.name;
+                  resourceType = "people";
+                }
+                if (el.planet_id != null) {
+                  uid = el.planet_id;
+                  fav = Array.from(planets).find((item) => Number(item.uid) === uid);
+                  name = fav.name;
+                  resourceType = "planets";
+                }
+                if (el.starship_id != null) {
+                  uid = el.starship_id;
+                  fav = Array.from(starships).find((item) => Number(item.uid) === uid);
+                  name = fav.name;
+                  resourceType = "starships";
+                }
+            }
               return (
-                <li key={el.uid}>
+                <li key={uid}>
                   <div className="d-flex justify-content-between">
-                    {el?.name}
+                    {name}
                     <button
                       type="button"
                       className="btn-close ps-4"
-                      onClick={() => removeFromFavorites(el.uid, el.resourceType, el.name)}
+                      onClick={() => removeFromFavorites(uid, resourceType)}
                     ></button>
                   </div>
                 </li>
