@@ -22,9 +22,22 @@ const Card = ({
     store: { favorites, token },
     actions: { addToFavorites, removeFromFavorites },
   } = useAppContext();
-  const isFavorite = Array.isArray(favorites) && favorites.some(
-    (item) => item.uid === uid && item.resourceType === resourceType
-  );
+  let isFavorite = false;
+  if (resourceType === "people") {
+    isFavorite = Array.isArray(favorites) && favorites.some(
+      (item) => item.character_id === Number(uid)
+    );
+  }
+  if (resourceType === "planets") {
+    isFavorite = Array.isArray(favorites) && favorites.some(
+      (item) => item.planet_id === Number(uid)
+    );
+  }
+  if (resourceType === "starships") {
+    isFavorite = Array.isArray(favorites) && favorites.some(
+      (item) => item.starship_id === Number(uid)
+    );
+  }
   
   return (
     <div
@@ -77,7 +90,7 @@ const Card = ({
             onClick={
               isFavorite
                 ? () => removeFromFavorites(uid, resourceType)
-                : () => addToFavorites(uid, resourceType, name)
+                : () => addToFavorites(uid, resourceType)
             }
           >
             {isFavorite ? (

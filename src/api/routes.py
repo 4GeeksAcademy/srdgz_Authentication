@@ -133,8 +133,11 @@ def add_favorite(user_id):
     return jsonify('Favorite successfully added'), 200
 
 @api.route('/user/<int:user_id>/favorites/<int:favorite_id>', methods=['DELETE'])
-def delete_favorite(favorite_id):
-    favorite = Favorites.query.get(favorite_id)
+def delete_favorite(user_id, favorite_id):
+    user = User.query.get(user_id)
+    if not user:
+        raise APIException('User not found', status_code=404)
+    favorite = Favorites.query.filter_by(id=favorite_id, user_id=user_id).first()
     if not favorite:
         raise APIException('Favorite not found', status_code=404)
     db.session.delete(favorite)

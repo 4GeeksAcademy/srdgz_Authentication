@@ -43,24 +43,28 @@ const addFavoriteToAPI = (resource_id, resource_type, user_id) => {
       });
     };
 
-const deleteFavoriteFromAPI = (user_id, favoriteId) => {
-  return fetch(`${BASE_URL}/user/${user_id}/favorites/${favoriteId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    .then((response) => {
-      if (response.ok) {
-        throw new Error("Favorite deleted successfully");
-      } else {
-        throw new Error("Failed to delete favorite");
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  };
+    const deleteFavoriteFromAPI = (user_id, favoriteId) => {
+      return fetch(`${BASE_URL}/user/${user_id}/favorites/${favoriteId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          return "Favorite deleted successfully";
+        } else if (response.status === 404) {
+          throw new Error("Favorite not found");
+        } else {
+          throw new Error("Failed to delete favorite");
+        }
+      })
+      .catch((error) => {
+        console.error("Error deleting favorite:", error);
+        throw error; 
+      });
+    }; 
+      
 
 const authFavorites = {
   addFavoriteToAPI,

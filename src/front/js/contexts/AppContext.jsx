@@ -51,7 +51,6 @@ export const AppContextProvider = ({ children }) => {
     localStorage.setItem("userId", response.user_id);
     setAuthenticated(true);
     const favorites = await authFavorites.getFavoritesFromAPI(response.user_id);
-    console.log(favorites);
     localStorage.setItem("favorites", JSON.stringify(favorites));
     navigate("/");
   } catch (error) {
@@ -79,7 +78,6 @@ export const AppContextProvider = ({ children }) => {
           duration: 5000,
         });
         navigate("/login");
-        localStorage.setItem(`userFavorites_${userId}`, JSON.stringify([]));
       } else {
         toast.error("Help me, Obi-Wan Kenobi. You are my only hope", {
           duration: 5000,
@@ -93,16 +91,15 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  const addToFavorites = async (resource_id, resource_type, name) => {
+  const addToFavorites = async (resource_id, resource_type) => {
     try {
       const userId = localStorage.getItem("userId");
       await authFavorites.addFavoriteToAPI(resource_id, resource_type, userId);
+      const updatedFavorites = await authFavorites.getFavoritesFromAPI(userId);
       let prevFavorites = JSON.parse(localStorage.getItem("favorites"));
       if (!prevFavorites) {
         prevFavorites = [];
       }
-      const newFavorite = { resource_id, name, resource_type };
-      const updatedFavorites = [...prevFavorites, newFavorite];
       localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
       setFavorites(updatedFavorites);
       toast.success("This is the way", {
@@ -127,16 +124,11 @@ export const AppContextProvider = ({ children }) => {
         throw new Error("Favorite not found");
       }
       const favoriteToRemove = favorites[favoriteToRemoveIndex];
-      
       await authFavorites.deleteFavoriteFromAPI(userId, favoriteToRemove.favorite_id);
-      
-      setFavorites((prev) => {
-        const newFavs = [...prev];
-        newFavs.splice(favoriteToRemoveIndex, 1);
-        localStorage.setItem("favorites", JSON.stringify(newFavs));
-        return newFavs;
-      });
-      
+      const newFavorites = [...favorites];
+      newFavorites.splice(favoriteToRemoveIndex, 1);
+      localStorage.setItem("favorites", JSON.stringify(newFavorites));
+      setFavorites(newFavorites);
       toast.success("Favorite removed successfully", {
         duration: 3000,
       });
