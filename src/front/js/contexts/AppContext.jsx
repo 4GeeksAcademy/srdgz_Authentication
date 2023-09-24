@@ -33,7 +33,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [token]);
 
-  /*
+
   useEffect(() => {
     const LSFavorites = localStorage.getItem("favorites");
 
@@ -42,7 +42,7 @@ export const AppContextProvider = ({ children }) => {
       return;
     }
   }, []);
-*/
+
 
   const login = async (email, password, navigate) => {
   try {
@@ -52,6 +52,7 @@ export const AppContextProvider = ({ children }) => {
     setAuthenticated(true);
     const favorites = await authFavorites.getFavoritesFromAPI(response.user_id);
     localStorage.setItem("favorites", JSON.stringify(favorites));
+    setFavorites(favorites);
     toast.success("The Force is with you", {
       duration: 3000,
     });

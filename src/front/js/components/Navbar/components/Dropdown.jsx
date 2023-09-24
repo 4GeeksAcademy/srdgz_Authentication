@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import useAppContext from "../../../contexts/AppContext.jsx";
 
@@ -26,7 +26,7 @@ const Dropdown = () => {
         >
           FAVORITES {counterFavorites}
         </button>
-        <ul className="dropdown-menu p-3">
+        <ul className="dropdown-menu dropdown-menu-end">
           {favorites && favorites.length > 0 ? (
             favorites.map((el) => {
               let uid = 0;
@@ -54,7 +54,7 @@ const Dropdown = () => {
                 }
             }
               return (
-                <li key={uid}>
+                <li key={uid} className="dropdown-item">
                   <div className="d-flex justify-content-between">
                     {name}
                     <button
