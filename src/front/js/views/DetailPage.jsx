@@ -21,24 +21,22 @@ const DetailPage = () => {
   switch (resourceType) {
     case "people":
       targetResource = people.find((person) => person.uid === uid);
-      resourceImage =
-        "https://starwars-visualguide.com/assets/img/characters/13.jpg";
+      resourceImage = `https://starwars-visualguide.com/assets/img/characters/${uid}.jpg`;
       break;
     case "planets":
       targetResource = planets.find((planet) => planet.uid === uid);
-      resourceImage =
-        "https://starwars-visualguide.com/assets/img/planets/8.jpg";
+      resourceImage = `https://starwars-visualguide.com/assets/img/planets/${uid}.jpg`;
       break;
     case "starships":
       targetResource = starships.find((starship) => starship.uid === uid);
-      resourceImage =
-        "https://starwars-visualguide.com/assets/img/starships/10.jpg";
+      resourceImage = `https://starwars-visualguide.com/assets/img/starships/${uid}.jpg`;
       break;
     default:
+      resourceImage = "https://i.blogs.es/2cc78a/ordenstarwars/1366_2000.jpg";
       break;
   }
 
-  const propertyNames = Object.keys(targetResource);
+  const propertyNames = Object.keys(targetResource || {});
   const excludedProperties = [
     "name",
     "url",
@@ -62,6 +60,9 @@ const DetailPage = () => {
               className="img-fluid"
               style={{ width: "400px", height: "400px", objectFit: "cover", borderRadius: "10%" }}
               alt={resourceType}
+              onError={(e) => {
+                e.target.src = "https://i.blogs.es/2cc78a/ordenstarwars/1366_2000.jpg";
+              }}
             />
           </div>
           <div className="col text-start m-5">

@@ -47,26 +47,38 @@ const Card = ({
     >
       {resourceType === "people" && (
         <img
-          src="https://starwars-visualguide.com/assets/img/categories/character.jpg"
+          src={`https://starwars-visualguide.com/assets/img/characters/${uid}.jpg`}
           className="card-img-top object-fit-cover"
           style={{ minWidth: "17rem", height: 200 }}
-          alt="..."
+          alt={`character ${name}`}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null;
+            currentTarget.src = "https://starwars-visualguide.com/assets/img/categories/character.jpg"
+          }}
         />
       )}
       {resourceType === "planets" && (
         <img
-          src="https://starwars-visualguide.com/assets/img/categories/planets.jpg"
+          src={`https://starwars-visualguide.com/assets/img/planets/${uid}.jpg`}
           className="card-img-top object-fit-cover"
           style={{ minWidth: "17rem", height: 200 }}
-          alt="..."
+          alt={`planet ${name}`}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null;
+            currentTarget.src = "https://starwars-visualguide.com/assets/img/categories/planets.jpg"
+          }}
         />
       )}
       {resourceType === "starships" && (
         <img
-          src="https://starwars-visualguide.com/assets/img/categories/starships.jpg"
+          src={`https://starwars-visualguide.com/assets/img/starships/${uid}.jpg`}
           className="card-img-top object-fit-cover"
           style={{ minWidth: "17rem", height: 200 }}
-          alt="..."
+          alt={`starship ${name}`}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null;
+            currentTarget.src = "https://starwars-visualguide.com/assets/img/categories/starships.jpg"
+          }}
         />
       )}
       <div className="card-body">
