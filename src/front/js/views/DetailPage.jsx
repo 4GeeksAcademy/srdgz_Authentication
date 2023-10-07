@@ -37,11 +37,7 @@ const DetailPage = () => {
   }
 
   const propertyNames = Object.keys(targetResource || {});
-  const excludedProperties = [
-    "name",
-    "url",
-    "uid",
-  ];
+  const excludedProperties = ["name", "url", "uid"];
 
   const transformPropertyName = (name) => {
     return name.toUpperCase().replace(/_/g, " ");
@@ -51,61 +47,58 @@ const DetailPage = () => {
   );
 
   return (
-    <div className="w-100 h-100">
-      <div className="container">
-        <div className="row row-col-md-2 rows-cols-2 my-5 p-3 border border-dark-subtle rounded">
-          <div className="col m-5 text-center">
-            <img
-              src={resourceImage}
-              className="img-fluid"
-              style={{ width: "400px", height: "400px", objectFit: "cover", borderRadius: "10%" }}
-              alt={resourceType}
-              onError={(e) => {
-                e.target.src = "https://i.blogs.es/2cc78a/ordenstarwars/1366_2000.jpg";
-              }}
-            />
-          </div>
-          <div className="col text-start m-5">
-            <h1 className="text-center text-white">{targetResource.name}</h1>
-            <p className="me-2 text-white">
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially unchanged. It was
-              popularised in the 1960s with the release of Letraset sheets
-              containing Lorem Ipsum passages, and more recently with desktop
-              publishing software like Aldus PageMaker including versions of
-              Lorem Ipsum.
-            </p>
-          </div>
-          <div className="container table-responsive">
-            <table className="table table-dark">
-              <thead>
-                <tr>
-                  {filteredPropertyNames.map((propertyName) => (
-                    <th
-                      key={propertyName}
-                      className="text-warning text-center align-middle"
-                    >
-                      <strong>{transformPropertyName(propertyName)}</strong>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {filteredPropertyNames.map((propertyName) => (
-                    <td key={propertyName} className="text-center text-white">
-                      {targetResource[propertyName]}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
+    <div className="container mt-5">
+      <div className="row">
+        <div className="col-md-6 mb-3 mb-md-0">
+          <img
+            src={resourceImage}
+            className="img-fluid"
+            style={{ width: "400px", height: "400px", objectFit: "cover", borderRadius: "10%" }}
+            alt={resourceType}
+            onError={(e) => {
+              e.target.src = "https://i.blogs.es/2cc78a/ordenstarwars/1366_2000.jpg";
+            }}
+          />
         </div>
+        <div className="col-md-6">
+          <h1 className="text-center text-white mb-3">{targetResource.name}</h1>
+          <p className="text-white">
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry's standard dummy text
+            ever since the 1500s, when an unknown printer took a galley of
+            type and scrambled it to make a type specimen book. It has survived
+            not only five centuries, but also the leap into electronic
+            typesetting, remaining essentially unchanged. It was popularised in
+            the 1960s with the release of Letraset sheets containing Lorem Ipsum
+            passages, and more recently with desktop publishing software like
+            Aldus PageMaker including versions of Lorem Ipsum.
+          </p>
+        </div>
+      </div>
+      <div className="table-responsive">
+        <table className="table table-dark my-5">
+          <thead>
+            <tr>
+              {filteredPropertyNames.map((propertyName) => (
+                <th
+                  key={propertyName}
+                  className="text-warning text-center align-middle"
+                >
+                  <strong>{transformPropertyName(propertyName)}</strong>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {filteredPropertyNames.map((propertyName) => (
+                <td key={propertyName} className="text-center text-white">
+                  {targetResource[propertyName]}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div className="d-flex justify-content-end">
         <Link to="/">

@@ -71,8 +71,7 @@ def login_user():
     user = User.query.filter_by(email=email).first()
     if not user or user.password != password:
         raise APIException('Invalid email or password', status_code=401) 
-    access_token = create_access_token(identity=user.id)
-    return jsonify({ 'token': access_token, 'user_id': user.id })
+    return create_token()
 
 
 #Ruta para registrar nuevo usuario
