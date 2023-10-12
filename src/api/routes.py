@@ -11,16 +11,13 @@ api = Blueprint('api', __name__)
 #Ruta para creación de token
 @api.route('/token', methods=['POST'])
 def create_token():
-    email = request.json.get('email', None)
-    password = request.json.get('password', None)
-    # Consulta la base de datos por el nombre de usuario y la contraseña
-    user = User.filter.query(email=email, password=password).first()
-    if User is None:
-          # el usuario no se encontró en la base de datos
-        return jsonify({'Bad username or password'}), 401
-    # crea un nuevo token con el id de usuario dentro
+    email = request.json.get('email')
+    password = request.json.get('password')
+    user = User.query.filter_by(email=email).first()
+    if user is None or not user.check_password(password):
+        return jsonify({'error': 'Bad username or password'}), 401
     access_token = create_access_token(identity=user.id)
-    return jsonify({ 'token': access_token, 'user_id': user.id })
+    return jsonify({'token': access_token, 'user_id': user.id}), 200
 
 
 # Rutas para usuarios
@@ -71,7 +68,8 @@ def login_user():
     user = User.query.filter_by(email=email).first()
     if not user or user.password != password:
         raise APIException('Invalid email or password', status_code=401) 
-    return create_token()
+    access_token = create_access_token(identity=user.id)
+    return jsonify({'token': access_token, 'user_id': user.id}), 200
 
 
 #Ruta para registrar nuevo usuario
